@@ -101,9 +101,8 @@
       </div>
   </div>
 
-
+  <button id="back-btn" class="btn btn-secondary" style="display:none; padding: 10px; width:150px; border-radius: 10px;">Back</button>
 </div>
-
 
 <script>
     function refreshImages() {
@@ -111,34 +110,56 @@
         document.getElementById('numerical-plot').src = "{% static 'mlapp/images/numerical_plot.png' %}?" + timestamp;
         document.getElementById('categorical-plot').src = "{% static 'mlapp/images/categorical_plot.png' %}?" + timestamp;
     }
+
+    const historyStack = [];
+    const backButton = document.getElementById('back-btn');
+
+    function showContent(contentId) {
+        const contentDivs = document.querySelectorAll('.analysis-content');
+        contentDivs.forEach(div => {
+            div.style.display = 'none';
+        });
+        document.getElementById(contentId).style.display = 'block';
+    }
+
+    function navigateTo(contentId) {
+        if (historyStack.length === 0 || historyStack[historyStack.length - 1] !== contentId) {
+            historyStack.push(contentId);
+            backButton.style.display = historyStack.length > 1 ? 'block' : 'none';
+        }
+        showContent(contentId);
+    }
+
+    backButton.addEventListener('click', function() {
+        if (historyStack.length > 1) {
+            historyStack.pop();  // Remove current content
+            const previousContent = historyStack.pop();  // Get previous content
+            backButton.style.display = historyStack.length > 0 ? 'block' : 'none';
+            showContent(previousContent);
+            historyStack.push(previousContent);  // Re-add the previous content to the stack
+        } else {
+            backButton.style.display = 'none';  // Hide the back button if no more history
+        }
+    });
+
     document.getElementById('univariate-btn').addEventListener('click', function() {
-        document.getElementById('univariate-content').style.display = 'block';
-        document.getElementById('bivariate-content').style.display = 'none';
-        document.getElementById('multivariate-content').style.display = 'none';
-        document.getElementById('relationship-content').style.display = 'none';
+        navigateTo('univariate-content');
         refreshImages();
     });
 
     document.getElementById('bivariate-btn').addEventListener('click', function() {
-        document.getElementById('univariate-content').style.display = 'none';
-        document.getElementById('bivariate-content').style.display = 'block';
-        document.getElementById('multivariate-content').style.display = 'none';
-        document.getElementById('relationship-content').style.display = 'none';
+        navigateTo('bivariate-content');
     });
 
     document.getElementById('multivariate-btn').addEventListener('click', function() {
-        document.getElementById('univariate-content').style.display = 'none';
-        document.getElementById('bivariate-content').style.display = 'none';
-        document.getElementById('multivariate-content').style.display = 'block';
-        document.getElementById('relationship-content').style.display = 'none';
+        navigateTo('multivariate-content');
     });
 
     document.getElementById('relationship-btn').addEventListener('click', function() {
-        document.getElementById('univariate-content').style.display = 'none';
-        document.getElementById('bivariate-content').style.display = 'none';
-        document.getElementById('multivariate-content').style.display = 'none';
-        document.getElementById('relationship-content').style.display = 'block';
+        navigateTo('relationship-content');
     });
+
+    navigateTo('univariate-content');
 
     document.getElementById('generate-plot').addEventListener('click', function() {
         const numColumns = 3
@@ -182,58 +203,57 @@
             });
     });
 
+    const selectedVariables = [];
+    const selectedVariablesList = document.getElementById('selected-variables');
 
-const selectedVariables = [];
-  const selectedVariablesList = document.getElementById('selected-variables');
+    document.getElementById('add-variables').addEventListener('click', function() {
+        const var1 = document.getElementById('variable1').value;
+        const var2 = document.getElementById('variable2').value;
+        const var3 = document.getElementById('variable3').value;
 
-  document.getElementById('add-variables').addEventListener('click', function() {
-    const var1 = document.getElementById('variable1').value;
-    const var2 = document.getElementById('variable2').value;
-    const var3 = document.getElementById('variable3').value;
+        // Avoid duplicates and ensure 3 variables are selected
+        if (var1 !== var2 && var1 !== var3 && var2 !== var3 && 
+            !selectedVariables.includes([var1, var2, var3])) { 
+            selectedVariables.push([var1, var2, var3]);
 
-    // Avoid duplicates and ensure 3 variables are selected
-    if (var1 !== var2 && var1 !== var3 && var2 !== var3 && 
-        !selectedVariables.includes([var1, var2, var3])) { 
-      selectedVariables.push([var1, var2, var3]);
-
-      const listItem = document.createElement('li');
-      listItem.textContent = `${var1}, ${var2}, ${var3}`;
-      selectedVariablesList.appendChild(listItem);
-    }
-  });
-
-  document.getElementById('generate-multivariate-plot').addEventListener('click', function() {
-    // Make sure at least one set of variables is selected
-    if (selectedVariables.length === 0) {
-      alert('Please select at least three variables.');
-      return;
-    }
-
-    // Send the selectedVariables array to your Django view using fetch or AJAX
-    fetch('/generate_multivariate_plot/', { // Update with correct URL
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for POST requests 
-      },
-      body: JSON.stringify({ variables: selectedVariables })
-    })
-    .then(response => response.json()) 
-    .then(data => {
-        // Display the plot (assuming your view returns a base64 encoded image)
-        const plotImg = document.createElement('img');
-        plotImg.src = `data:image/png;base64,${data.plot_base64}`;
-        plotImg.style.maxWidth = '100%';
-        plotImg.style.height = 'auto';
-        // ... other styling ...
-
-        const plotContainer = document.getElementById('multivariate-plot');
-        plotContainer.innerHTML = ''; 
-        plotContainer.appendChild(plotImg);
-    })
-    .catch(error => {
-      console.error('Error fetching plot:', error);
+            const listItem = document.createElement('li');
+            listItem.textContent = `${var1}, ${var2}, ${var3}`;
+            selectedVariablesList.appendChild(listItem);
+        }
     });
-  });
+
+    document.getElementById('generate-multivariate-plot').addEventListener('click', function() {
+        // Make sure at least one set of variables is selected
+        if (selectedVariables.length === 0) {
+            alert('Please select at least three variables.');
+            return;
+        }
+
+        // Send the selectedVariables array to your Django view using fetch or AJAX
+        fetch('/generate_multivariate_plot/', { // Update with correct URL
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for POST requests 
+            },
+            body: JSON.stringify({ variables: selectedVariables })
+        })
+        .then(response => response.json()) 
+        .then(data => {
+            // Display the plot (assuming your view returns a base64 encoded image)
+            const plotImg = document.createElement('img');
+            plotImg.src = `data:image/png;base64,${data.plot_base64}`;
+            plotImg.style.maxWidth = '100%';
+            plotImg.style.height = 'auto';
+            // ... other styling ...
+
+            const plotContainer = document.getElementById('multivariate-plot');
+            plotContainer.innerHTML = ''; 
+            plotContainer.appendChild(plotImg);
+        })
+        .catch(error => {
+            console.error('Error fetching plot:', error);
+        });
+    });
 </script>
 {% endblock %}

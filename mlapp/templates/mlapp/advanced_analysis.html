@@ -9,29 +9,74 @@
   </div>
 
   <div id="data_statistics-content" class="adv-content">
-    <h2>Data Head</h2>
-    <form method="get" action="{% url 'advanced_analysis' %}">
-        <label for="rows_to_display">Show rows:</label>
-        <select name="rows_to_display" id="rows_to_display" onchange="this.form.submit()">
-            <option value="5" {% if rows_to_display == "5" %}selected{% endif %}>5</option>
-            <option value="10" {% if rows_to_display == "10" %}selected{% endif %}>10</option>
-            <option value="30" {% if rows_to_display == "30" %}selected{% endif %}>30</option>
-            <option value="50" {% if rows_to_display == "50" %}selected{% endif %}>50</option>
-            <option value="100" {% if rows_to_display == "100" %}selected{% endif %}>100</option>
-            <option value="500" {% if rows_to_display == "500" %}selected{% endif %}>500</option>
-            <option value="all" {% if rows_to_display == "all" %}selected{% endif %}>All</option>
-        </select>
-    </form>
-    <div class="scrollable">{{ data_head|safe }}</div>
+    {% include 'mlapp/data_statistics.html' %}
+  </div>
 
-    <h2>Data Info</h2>
-    <pre class="scrollable">{{ data_info }}</pre>
+  <div id="data_cleaning-content" class="adv-content" style="display:none;">
+    {% include 'mlapp/clean_data.html' %}
+  </div>
+  <button id="back-btn" class="btn btn-secondary" style="display:none; padding: 10px; width:150px;border-radius: 10px;">Back</button>
+</div>
 
-    <h2>Missing Values</h2>
-    <div class="scrollable">{{ missing_values|safe }}</div>
+<script>
+  const historyStack = [];  // To keep track of the navigation history
+  const backButton = document.getElementById('back-btn');
 
-    <h2>Summary Statistics for Numerical Variables</h2>
-    <div class="scrollable">{{ summary_statistics|safe }}</div>
+  function showContent(contentId) {
+    const contentDivs = document.querySelectorAll('.adv-content');
+    contentDivs.forEach(div => {
+      div.style.display = 'none';
+    });
+    document.getElementById(contentId).style.display = 'block';
+  }
+
+  function navigateTo(contentId) {
+    if (historyStack.length === 0 || historyStack[historyStack.length - 1] !== contentId) {
+      historyStack.push(contentId);
+      backButton.style.display = historyStack.length > 1 ? 'block' : 'none';
+    }
+    showContent(contentId);
+  }
+
+  backButton.addEventListener('click', function() {
+    if (historyStack.length > 1) {
+      historyStack.pop();  // Remove current content
+      const previousContent = historyStack.pop();  // Get previous content
+      backButton.style.display = historyStack.length > 0 ? 'block' : 'none';
+      showContent(previousContent);
+      historyStack.push(previousContent);  // Re-add the previous content to the stack
+    } else {
+      backButton.style.display = 'none';  // Hide the back button if no more history
+    }
+  });
+
+  document.getElementById('data_statistics-btn').addEventListener('click', function() {
+    navigateTo('data_statistics-content');
+  });
+
+  document.getElementById('data_cleaning-btn').addEventListener('click', function() {
+    navigateTo('data_cleaning-content');
+  });
+
+  // Initially show data_statistics content
+  navigateTo('data_statistics-content');
+</script>
+
+{% endblock %}
+
+
+{% comment %} {% extends 'mlapp/base.html' %}
+{% block title %}Advanced Analysis - HR Analytics App{% endblock %}
+{% block content %}
+
+<div class="container" style="width: 1200px; position:absolute; top:105px; left:265px">
+  <div class="sub-navbar" style="background-color: #f4f4f4; padding: 10px; display: flex; justify-content: space-around; border-radius: 10px;">
+    <button id="data_statistics-btn" class="btn btn-secondary">Data Statistics</button>
+    <button id="data_cleaning-btn" class="btn btn-secondary">Data Cleaning</button>
+  </div>
+
+  <div id="data_statistics-content" class="adv-content">
+    {% include 'mlapp/data_statistics.html' %}
   </div>
 
   <div id="data_cleaning-content" class="adv-content" style="display:none;">
@@ -60,4 +105,4 @@
   showContent('data_statistics-content');
 </script>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

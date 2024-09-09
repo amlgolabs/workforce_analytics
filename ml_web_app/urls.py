@@ -31,6 +31,7 @@ urlpatterns = [
     path('contact/success/', views.contact_success, name='contact_success'),
     path('data_statistics/', views.data_statistics, name='data_statistics'),
     path('upload_file/', views.upload_file, name='upload_file'),
+    path('update_profile/', views.update_profile, name='update_profile'),
     path('clean_data/', views.clean_data, name='clean_data'),
     path('generate_bivariate_plot/', views.generate_bivariate_plot, name='generate_bivariate_plot'),
     path('detailed_eda/', views.detailed_eda, name='detailed_eda'),
@@ -48,5 +49,6 @@ urlpatterns = [
     path('performance_prediction/', views.performance_prediction, name='performance_prediction'),
     path('process_csv3/', views.process_csv3, name='process_csv3'),
     path('generate_correlation_plot/', views.generate_correlation_plot, name='generate_correlation_plot'),
+    path('download_result/', views.download_result, name='download_result'),
 ]
 urlpatterns += staticfiles_urlpatterns()
