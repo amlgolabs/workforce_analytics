@@ -90,9 +90,24 @@
 			a:hover {
 				text-decoration: underline;
 			}
+
+			.action-buttons {
+				margin-bottom: 20px;
+			}
+
+			.action-buttons button {
+				margin: 5px;
+			}
+
+			.download-button {
+				background-color: #28a745;
+			}
+
+			.download-button:hover {
+				background-color: #218838;
+			}
 		</style>
 		</head>
-	</div>
 	<body>
 		{% block content %}
 		<div class="container">
@@ -137,6 +152,7 @@
 					<input type="text" placeholder="Search anything...">
 					<button><i class="fas fa-file-export"></i> Export</button>
 					<button><i class="fas fa-plus"></i> New Payroll</button>
+					<a href="https://app.powerbi.com/view?r=eyJrIjoiMGFhMDg3OGMtOTNhYS00MTY3LTliN2QtNTA2ZmU1MjVhOWM1IiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9" class="download-button" target="_blank">Download Dashboard as PDF</a>
 				</div>
 				<h2>Explore Dashboard</h2>
 				<p>
