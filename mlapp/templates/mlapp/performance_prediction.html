@@ -1,0 +1,276 @@
+<h2>Employee Performance Prediction</h2>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+
+
+.prediction-form {
+  max-width: 1080px;
+  background: #fff;
+  width: 100%;
+  padding: 25px 40px;
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+
+.prediction-form .form-group {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.prediction-form label {
+  position: absolute;
+  top: 15px;
+  left: 70px;
+  font-size: 16px;
+  color: #333;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: #fff; /* Ensures label is readable when overlapping the input field */
+  padding: 0 5px; /* Adds space around the label text */
+  transform: translateY(0); /* Initial position */
+}
+
+.prediction-form input,
+.prediction-form textarea {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius:30px
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.12);
+  font-size: 16px;
+  color: #333;
+  background: transparent;
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prediction-form input:focus,
+.prediction-form input:valid,
+.prediction-form textarea:focus,
+.prediction-form textarea:valid {
+  border-bottom: 3px solid #3498db; /* Increased width on focus */
+  box-shadow: 0 1px 0 0 #3498db;
+  outline: none;
+}
+
+.prediction-form input:focus ~ label,
+.prediction-form input:valid ~ label,
+.prediction-form textarea:focus ~ label,
+.prediction-form textarea:valid ~ label {
+  transform: translateY(-24px) scale(0.85); /* Move and scale the label */
+  font-size: 14px;
+  color: #3498db;
+}
+
+.prediction-form input::placeholder,
+.prediction-form textarea::placeholder {
+  color: transparent; /* Hide placeholder text when label is above */
+}
+
+.prediction-form button {
+  
+  border: none;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.prediction-form button:hover {
+  transform: scale(1.05);
+}
+
+.prediction-form button:focus {
+  outline: none;
+}
+
+.prediction-form textarea {
+  height: 100px;
+  resize: none;
+}
+
+@media (max-width: 700px) {
+  .prediction-form {
+    padding: 15px;
+  }
+
+  .prediction-form .form-group {
+    margin-bottom: 20px;
+  }
+
+  .prediction-form input,
+  .prediction-form textarea,
+  .prediction-form button {
+    font-size: 15px;
+  }
+}
+
+.form-group .underline{
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+}
+.form-group .underline:before{
+  position: absolute;
+  left:75px;
+  content: "";
+  height: 2px;
+  width: 65%;
+  background: #3498db;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+.form-group input:focus ~ .underline:before,
+.form-group input:valid ~ .underline:before,
+.textarea textarea:focus ~ .underline:before,
+.textarea textarea:valid ~ .underline:before{
+  transform: scale(1);
+}
+
+
+
+.prediction-form select {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.12);
+  font-size: 16px;
+  color: #333;
+  background: transparent;
+  appearance: none; /* Remove default arrow */
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prediction-form select:focus,
+.prediction-form select:not(:placeholder-shown) {
+  border-bottom: 3px solid #3498db;
+  box-shadow: 0 1px 0 0 #3498db;
+  outline: none;
+}
+
+.prediction-form select:focus ~ label,
+.prediction-form select:not(:placeholder-shown) ~ label {
+  transform: translateY(-24px) scale(0.85);
+  font-size: 14px;
+  color: #3498db;
+}
+
+.prediction-form select + .underline {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+}
+
+.prediction-form select:focus + .underline:before,
+.prediction-form select:not(:placeholder-shown) + .underline:before {
+  transform: scaleX(1);
+}
+
+</style>
+
+<form method="post" class="prediction-form" id="PR"> 
+    {% csrf_token %}
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="DailyRate" name="DailyRate" placeholder="Enter Daily Rate" required>
+        <div class="underline"></div>
+        <label for="DailyRate">Daily Rate:</label>
+        </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="HourlyRate" name="HourlyRate" placeholder="Enter Hourly Rate" required>
+        <div class="underline"></div>
+        <label for="HourlyRate">Hourly Rate:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="distance" name="distance" placeholder="Enter distance" required>
+        <div class="underline"></div>
+        <label for="distance">Distance From Home:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="yearsatcompany" name="yearsatcompany" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="yearsatcompany">Years at Company:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="totalworkingyears" name="totalworkingyears" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="totalworkingyears">Total Working Years:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="percentsalaryhike" name="percentsalaryhike" placeholder="Enter Salary Hike(%)" required>
+        <div class="underline"></div>
+        <label for="percentsalaryhike">Percent Salary Hike:</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Predict</button>
+</form>
+
+<br>
+<button type="button" onclick="location.href='{% url 'process_csv2' %}'" class="btn btn-primary">Download predictions for your file</button>
+
+<div id="predictionModal2" class="modal2" style="display:None;">
+  <div class="modal-content2" style="position: relative; left:340px; top:15px; padding: 20px; max-width:400px; border-radius: 30px; background-color: #f4f4f4; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <span class="close2" style="position: relative; top: -10px; left: 180px; font-size: 18px; cursor: pointer;">&times;</span>
+    <p id="predictionResult2" style="font-size: 16px; color: #333;"> testing<br>test</p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle form submission
+    document.querySelector('#PR').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this); // Create FormData object from the form
+
+        fetch("{% url 'performance_prediction' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.error) {
+                // Display error if there's an issue with the request
+                document.getElementById('predictionResult2').innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+                // Display prediction results
+                const resultText = `Prediction: ${data.prediction}<br>Probability: ${data.probability.toFixed(2)}%`;
+                console.log(resultText)
+                document.getElementById('predictionResult2').innerHTML = resultText;
+                document.getElementById('predictionModal2').style.display = 'block'; // Show the modal
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occurred during fetch
+            console.error('Error:', error);
+            document.getElementById('predictionResult2').innerHTML = `<p style="color:red;">An error occurred. Please try again.</p>`;
+        });
+    });
+
+    // Function to close the modal
+    document.querySelector('.close2').addEventListener('click', function() {
+        document.getElementById('predictionModal2').style.display = 'none'; 
+    });
+});
+</script>
+

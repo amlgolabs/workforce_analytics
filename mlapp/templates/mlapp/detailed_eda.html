@@ -1,0 +1,239 @@
+{% extends "mlapp/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container" style="width: 1200px; position:absolute; top:105px; left:265px">
+  <div class="sub-navbar" style="background-color: #f4f4f4; padding: 10px; display: flex; justify-content: space-around; border-radius: 10px;">
+    <button id="univariate-btn" class="btn btn-secondary">Single Column Analysis</button>
+    <button id="bivariate-btn" class="btn btn-secondary">Double Column Analysis</button>
+    <button id="multivariate-btn" class="btn btn-secondary">Multi-Column Analysis</button>
+    <button id="relationship-btn" class="btn btn-secondary">Relation Analysis</button>
+  </div>
+
+  <div id="univariate-content" class="analysis-content">
+    <h3>Single Column Analysis</h3>
+    <h4>Numerical Columns</h4>
+    <img id="numerical-plot" src="{% static 'mlapp/images/numerical_plot.png' %}" class="img-fluid" alt="Numerical Columns">
+    <h4>Categorical Columns</h4>
+    <img id="categorical-plot" src="{% static 'mlapp/images/categorical_plot.png' %}" class="img-fluid" alt="Categorical Columns">
+  </div>
+
+  <div id="bivariate-content" class="analysis-content" style="display:none;">
+    <h3>Double Column Analysis</h3>
+    <div class="form-group row" style="display: flex; justify-content: space-around; width:auto;">
+      <div class="col-md-3">
+        <label for="target-column">Select column with respect to which you want to see all other columns:</label>
+        <select id="target-column" class="form-control">
+          {% for column in df.columns %}
+          <option value="{{ column }}">{{ column }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 align-self-end">
+        <button id="generate-plot" class="btn btn-primary" style="position:relative;top:15px">Generate Plot</button>
+      </div>
+    </div>
+    <div id="bivariate-plot">
+      <!-- Bivariate plots will be displayed here -->
+    </div>
+  </div>
+
+  <div id="multivariate-content" class="analysis-content" style="display:none;width:auto;">
+    <h3>Multi-Column Analysis</h3>
+    <div class="form-group row" style="width:auto;">
+      <div class="col-md-3">
+        <label for="variable1">Variable 1:</label>
+        <select id="variable1" class="form-control" style="width:auto;">
+          {% for column in df.columns %}
+            <option value="{{ column }}">{{ column }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="variable2">Variable 2:</label>
+        <select id="variable2" class="form-control" style="width:auto;">
+          {% for column in df.columns %}
+            <option value="{{ column }}">{{ column }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="variable3">Variable 3:</label>
+        <select id="variable3" class="form-control" style="width:auto;">
+          {% for column in df.columns %}
+            <option value="{{ column }}">{{ column }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 align-self-end" style="width:auto;position:relative;top:15px">
+        <button id="add-variables" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+
+    <div class="form-group" style="width:auto;">
+      <label for="selected-variables">Selected Variables:</label>
+      <ul id="selected-variables"></ul>
+    </div>
+
+    <button id="generate-multivariate-plot" class="btn btn-primary">Generate Plot</button>
+
+    <div id="multivariate-plot">
+      <!-- Multivariate plot will be displayed here -->
+    </div>
+  </div>
+
+  <div id="relationship-content" class="analysis-content" style="display:none;">
+      <h3>Correlation Analysis</h3>
+      <div class="form-group row" style="display: flex; justify-content: space-around; width:auto;">
+          <div class="col-md-3">
+              <label for="target-column1">Select column to check its correlation with other columns:</label>
+              <select id="target-column1" class="form-control">
+                  {% for column in columns %}
+                  <option value="{{ column }}">{{ column }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div class="col-md-3 align-self-end">
+              <button id="generate-plot1" class="btn btn-primary" style="position:relative;top:15px">Generate Plot</button>
+          </div>
+      </div>
+      <div id="relationship-plot">
+          <!-- Correlation plot will be displayed here -->
+      </div>
+  </div>
+
+
+</div>
+
+
+<script>
+    function refreshImages() {
+        const timestamp = new Date().getTime(); // Unique timestamp to force reload
+        document.getElementById('numerical-plot').src = "{% static 'mlapp/images/numerical_plot.png' %}?" + timestamp;
+        document.getElementById('categorical-plot').src = "{% static 'mlapp/images/categorical_plot.png' %}?" + timestamp;
+    }
+    document.getElementById('univariate-btn').addEventListener('click', function() {
+        document.getElementById('univariate-content').style.display = 'block';
+        document.getElementById('bivariate-content').style.display = 'none';
+        document.getElementById('multivariate-content').style.display = 'none';
+        document.getElementById('relationship-content').style.display = 'none';
+        refreshImages();
+    });
+
+    document.getElementById('bivariate-btn').addEventListener('click', function() {
+        document.getElementById('univariate-content').style.display = 'none';
+        document.getElementById('bivariate-content').style.display = 'block';
+        document.getElementById('multivariate-content').style.display = 'none';
+        document.getElementById('relationship-content').style.display = 'none';
+    });
+
+    document.getElementById('multivariate-btn').addEventListener('click', function() {
+        document.getElementById('univariate-content').style.display = 'none';
+        document.getElementById('bivariate-content').style.display = 'none';
+        document.getElementById('multivariate-content').style.display = 'block';
+        document.getElementById('relationship-content').style.display = 'none';
+    });
+
+    document.getElementById('relationship-btn').addEventListener('click', function() {
+        document.getElementById('univariate-content').style.display = 'none';
+        document.getElementById('bivariate-content').style.display = 'none';
+        document.getElementById('multivariate-content').style.display = 'none';
+        document.getElementById('relationship-content').style.display = 'block';
+    });
+
+    document.getElementById('generate-plot').addEventListener('click', function() {
+        const numColumns = 3
+        const plotType = 'box'
+        const targetColumn = document.getElementById('target-column').value;
+
+        fetch(`/generate_bivariate_plot?num_columns=${numColumns}&plot_type=${plotType}&target_column=${targetColumn}`)
+            .then(response => response.json())
+            .then(data => {
+                const plotImg = document.createElement('img');
+                plotImg.src = `data:image/png;base64,${data.plot_base64}`;
+                plotImg.style.maxWidth = '100%';
+                plotImg.style.height = 'auto';
+                plotImg.style.width = '1200px';
+                plotImg.style.display = 'block';
+                plotImg.style.margin = '0 auto';
+
+                const plotContainer = document.getElementById('bivariate-plot');
+                plotContainer.innerHTML = ''; // Clear any previous plots
+                plotContainer.appendChild(plotImg);
+            });
+    });
+
+    document.getElementById('generate-plot1').addEventListener('click', function() {
+        const targetColumn = document.getElementById('target-column1').value;
+    
+        fetch(`/generate_correlation_plot?target_column=${targetColumn}`)
+            .then(response => response.json())
+            .then(data => {
+                const plotImg = document.createElement('img');
+                plotImg.src = `data:image/png;base64,${data.plot_base64}`;
+                plotImg.style.maxWidth = '100%';
+                plotImg.style.height = 'auto';
+                plotImg.style.width = '1200px';
+                plotImg.style.display = 'block';
+                plotImg.style.margin = '0 auto';
+            
+                const plotContainer = document.getElementById('relationship-plot');
+                plotContainer.innerHTML = ''; // Clear any previous plots
+                plotContainer.appendChild(plotImg);
+            });
+    });
+
+
+const selectedVariables = [];
+  const selectedVariablesList = document.getElementById('selected-variables');
+
+  document.getElementById('add-variables').addEventListener('click', function() {
+    const var1 = document.getElementById('variable1').value;
+    const var2 = document.getElementById('variable2').value;
+    const var3 = document.getElementById('variable3').value;
+
+    // Avoid duplicates and ensure 3 variables are selected
+    if (var1 !== var2 && var1 !== var3 && var2 !== var3 && 
+        !selectedVariables.includes([var1, var2, var3])) { 
+      selectedVariables.push([var1, var2, var3]);
+
+      const listItem = document.createElement('li');
+      listItem.textContent = `${var1}, ${var2}, ${var3}`;
+      selectedVariablesList.appendChild(listItem);
+    }
+  });
+
+  document.getElementById('generate-multivariate-plot').addEventListener('click', function() {
+    // Make sure at least one set of variables is selected
+    if (selectedVariables.length === 0) {
+      alert('Please select at least three variables.');
+      return;
+    }
+
+    // Send the selectedVariables array to your Django view using fetch or AJAX
+    fetch('/generate_multivariate_plot/', { // Update with correct URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for POST requests 
+      },
+      body: JSON.stringify({ variables: selectedVariables })
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        // Display the plot (assuming your view returns a base64 encoded image)
+        const plotImg = document.createElement('img');
+        plotImg.src = `data:image/png;base64,${data.plot_base64}`;
+        plotImg.style.maxWidth = '100%';
+        plotImg.style.height = 'auto';
+        // ... other styling ...
+
+        const plotContainer = document.getElementById('multivariate-plot');
+        plotContainer.innerHTML = ''; 
+        plotContainer.appendChild(plotImg);
+    })
+    .catch(error => {
+      console.error('Error fetching plot:', error);
+    });
+  });
+</script>
+{% endblock %}

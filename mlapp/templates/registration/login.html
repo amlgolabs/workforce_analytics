@@ -1,0 +1,77 @@
+<!-- @format -->
+{% extends 'mlapp/base.html' %} {% load static %}
+<!-- templates/registration/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Login</title>
+		<link rel="stylesheet" href="{% static 'mlapp/style.css' %}" />
+		<style>
+			.container {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background-color: #f0f0f0;
+				padding: 20px;
+				border: 1px solid #ddd;
+				border-radius: 10px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				width: 300px; /* Add a fixed width */
+				height: 250px; /* Add a fixed height */
+				text-align: center; /* Center the text */
+			}
+			.container form {
+				margin-top: 20px; /* Add some margin to the form */
+			}
+			.container label {
+				display: block; /* Make the labels block-level elements */
+				margin-bottom: 10px; /* Add some margin to the labels */
+			}
+			.container input[type="text"], .container input[type="password"] {
+				width: 100%; /* Make the inputs full-width */
+				height: 40px; /* Add a fixed height to the inputs */
+				margin-bottom: 20px; /* Add some margin to the inputs */
+				padding: 10px; /* Add some padding to the inputs */
+				border: 1px solid #ccc; /* Add a border to the inputs */
+				border-radius: 5px; /* Add a border radius to the inputs */
+			}
+			.container button[type="submit"] {
+				width: 100%; /* Make the button full-width */
+				height: 40px; /* Add a fixed height to the button */
+				background-color: #4CAF50; /* Add a background color to the button */
+				color: #fff; /* Add a text color to the button */
+				padding: 10px; /* Add some padding to the button */
+				border: none; /* Remove the border from the button */
+				border-radius: 5px; /* Add a border radius to the button */
+				cursor: pointer; /* Add a cursor to the button */
+			}
+		</style>
+	</head>
+	<body>
+		{% block content %}
+		<div class="container">
+			<h2>Login</h2>
+			<form method="post">
+				{% csrf_token %} {% if messages %}
+				<ul class="errorlist">
+					{% for message in messages %}
+					<li>{{ message }}</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+				<div>
+					<label for="id_username">Username:</label>
+					<input type="text" id="id_username" name="username" required />
+				</div>
+				<div>
+					<label for="id_password">Password:</label>
+					<input type="password" id="id_password" name="password" required />
+				</div>
+				<button type="submit">Login</button>
+			</form>
+		</div>
+		{% endblock %}
+	</body>
+</html>

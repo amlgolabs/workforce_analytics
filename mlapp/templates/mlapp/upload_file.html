@@ -1,0 +1,87 @@
+<!-- templates/mlapp/upload_file.html -->
+
+{% extends 'mlapp/base.html' %}
+{% block title %}Upload Your Own File - HR Analytics App{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Upload Your CSV or Excel File</h2>
+
+    {% if messages %}
+        <ul class="errorlist">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+ 
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ upload_form.as_p }}
+        <button type="submit">Upload and Analyze</button>
+    </form>
+
+    <p>
+        Supported file types: CSV, XLSX, XLS
+    </p>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} <!-- templates/mlapp/upload_file.html -->
+{% extends 'mlapp/base.html' %}
+{% block title %}Upload Your Own File - HR Analytics App{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Upload Your CSV or Excel File</h2>
+
+    {% if messages %}
+        <ul class="errorlist">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ upload_form.as_p }}
+        <button type="submit">Upload and Analyze</button>
+    </form>
+
+    <p>
+        Supported file types: CSV, XLSX, XLS
+    </p>
+</div>
+{% endblock %} {% endcomment %}
+
+{% comment %} https://app.powerbi.com/view?r=eyJrIjoiZDViOTBjYTUtZTQ2YS00MzdmLTlmYmItNGE3NjE0ZmRiNTFiIiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9 {% endcomment %}
+{% comment %} {% extends 'mlapp/base.html' %}
+{% block title %}Upload Your Own File - HR Analytics App{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Upload Your CSV or Excel File</h2>
+
+    {% if messages %}
+        <ul class="errorlist">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ upload_form.as_p }}
+        <button type="submit">Upload and Analyze</button>
+    </form>
+
+    <p>
+        Supported file types: CSV, XLSX, XLS
+    </p>
+</div>
+{% endblock %} {% endcomment %}

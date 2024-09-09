@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Data Cleaning</title>
+    <!-- Uncomment the line below if you want to include Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+    <style>
+        .plot-container {
+            overflow: auto;
+            max-height: 600px;
+        }
+        .data-preview {
+            margin-top: 20px;
+        }
+        .box {
+            border-radius: 20px;
+            background: lightcyan;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Data Cleaning Operations</h2>
+        <br>
+        <div class="box">
+            <h3>Remove Specified Columns</h3>
+            <!-- Suggest Columns to Remove -->
+            <div class="form-group">
+                <button id="suggestColumnsBtn" class="btn btn-primary">Suggest Columns to Remove</button>
+            </div>
+            <br>
+            <!-- Remove Specified Columns -->
+            <div class="form-group" style="display: flex; flex-direction: row; gap: 10px; width: 100%; justify-content: start;">
+                <!-- Label and Select Box -->
+                <div style="display: flex; flex-direction: column; gap: 5px; width: 310px;">
+                    <label for="columnsToRemove" style="margin-bottom: 5px; text-align: left;">Remove Specified Columns:</label>
+                    <select id="columnsToRemove" class="form-control" multiple style="height: 100px; width: 300px;"></select>
+                </div>
+                <div>
+                    <!-- Manual Column Name Input and Add Column Button -->
+                    <div style="display: flex; flex-direction: row; align-items: start; justify-content: start; gap: 6px; width: 680px; margin: 0;">
+                        <input type="text" id="manualColumnName" class="form-control" placeholder="Enter column name to remove" style="width: 100%; height: 52px;">
+                        <button id="addManualColumnBtn" class="btn btn-secondary" style="width: 100%; height: 50px; position:relative;top:5px;">Add Column</button>
+                    </div>
+                    <!-- Remove Columns Button -->
+                    <div>
+                        <button id="removeColumnsBtn" class="btn btn-danger" style="width: 100%;">Remove Selected Columns</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="box">
+            <h3>Handle Missing Values</h3>
+            <!-- Handle Missing Values -->
+            <div class="form-group" style="display: flex; flex-direction: row; align-items: start; justify-content: center;">
+                <div style="display: flex; flex-direction: column; align-items: start; gap: 6px; width: 720px; margin: 0;">
+                    <label for="missingValuesMethod">Handle Missing Values:</label>
+                    <select id="missingValuesMethod" class="form-control">
+                        <option value="remove">Remove Rows with Missing Values</option>
+                        <option value="mean">Replace with Mean</option>
+                        <option value="median">Replace with Median</option>
+                        <option value="mode">Replace with Mode</option>
+                        <option value="KNN">KNN Imputation</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: start; gap: 6px; width: 720px; margin: 0;">
+                    <label for="knnK">K value for KNN (if applicable):</label>
+                    <input type="number" id="knnK" class="form-control mt-2" placeholder="K value for KNN (default 5)" value="5">
+                </div>
+                <button id="handleMissingValuesBtn" class="btn btn-primary mt-2">Handle Missing Values</button>
+            </div>
+        </div>
+        <br>
+        <div class="box">
+            <h3>Detect and Remove Outliers</h3>
+            <!-- Generate Box Plot -->
+            <div class="form-group" style="display: flex; flex-direction: row; align-items: start; justify-content: center;">
+                <button id="generateBoxPlotBtn" class="btn btn-primary">Generate Box Plot</button>
+            </div>
+            <br>
+            <!-- Remove Outliers -->
+            <div class="form-group" style="display: flex; flex-direction: row; align-items: start; justify-content: center;">
+                <div style="display: flex; flex-direction: column; align-items: start; gap: 6px; width: 720px; margin: 0;">
+                    <label for="outlierMethod">Remove Outliers Using:</label>
+                    <select id="outlierMethod" class="form-control">
+                        <option value="iqr">IQR Method</option>
+                        <option value="zscore">Z-Score Method</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: start; gap: 6px; width: 720px; margin: 0;">
+                    <label for="zThreshold">Z-Score Threshold (if applicable):</label>
+                    <input type="number" id="zThreshold" class="form-control mt-2" placeholder="Z-Score Threshold (default 3)" value="3">
+                </div>
+                <button id="removeOutliersBtn" class="btn btn-primary mt-2">Remove Outliers</button>
+            </div>
+        </div>
+        <br>
+        <!-- Replace File with Cleaned Data -->
+        <div class="form-group">
+            <button id="replaceFileBtn" class="btn btn-warning">Replace Original File with Cleaned Data</button>
+        </div>
+        <br>
+        <!-- Refresh Data Preview -->
+        <div class="form-group">
+            <button id="refreshPreviewBtn" class="btn btn-info">Refresh Data Preview</button>
+        </div>
+        <br>
+        <!-- Data Preview and Plots -->
+        <div class="data-preview" style="width: 1040px;">
+            <h3>Data Preview:</h3>
+            <!-- Container with scrollable table -->
+            <div id="dataPreview" class="table-responsive" style="max-width: 100%; overflow-x: auto;">
+                <!-- The actual table should be placed here -->
+            </div>
+        </div>
+
+        <br>
+        <div class="plot-container">
+            <h3>View Plots:</h3>
+            <div id="suggestedPlots"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function getCSRFToken() {
+                return $('meta[name="csrf-token"]').attr('content');
+            }
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRFToken': getCSRFToken()
+                }
+            });
+
+            function updateDataPreview() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'refresh_preview' }),
+                    success: function(response) {
+                        $('#dataPreview').html(response.df);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error refreshing data preview:', error);
+                    }
+                });
+            }
+
+            $('#suggestColumnsBtn').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'suggest_columns' }),
+                    success: function(response) {
+                        let columns = response.columns;
+                        let select = $('#columnsToRemove').empty();
+                        columns.forEach(col => select.append(new Option(col, col)));
+                        let plots = $('#suggestedPlots').empty();
+                        for (let col in response.plot_data) {
+                            let img = $('<img>').attr('src', 'data:image/png;base64,' + response.plot_data[col]).addClass('img-fluid');
+                            plots.append($('<div>').append(img));
+                        }
+                    }
+                });
+            });
+
+            $('#addManualColumnBtn').click(function() {
+                let manualColumnName = $('#manualColumnName').val().trim();
+                if (manualColumnName) {
+                    $('#columnsToRemove').append(new Option(manualColumnName, manualColumnName));
+                    $('#manualColumnName').val('');
+                }
+            });
+
+            $('#removeColumnsBtn').click(function() {
+                let columnsToRemove = $('#columnsToRemove').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'remove_columns', columns: columnsToRemove }),
+                    success: function(response) {
+                        alert(response.message);
+                        updateDataPreview();
+                    }
+                });
+            });
+
+            $('#handleMissingValuesBtn').click(function() {
+                let method = $('#missingValuesMethod').val();
+                let k = $('#knnK').val() || 5;
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'handle_missing_values', method: method, k: k }),
+                    success: function(response) {
+                        alert(response.message);
+                        updateDataPreview();
+                    }
+                });
+            });
+
+            $('#generateBoxPlotBtn').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'generate_box_plot' }),
+                    success: function(response) {
+                        let plot = $('<img>').attr('src', 'data:image/png;base64,' + response.box_plot).addClass('img-fluid');
+                        $('#suggestedPlots').empty().append(plot);
+                    }
+                });
+            });
+
+            $('#removeOutliersBtn').click(function() {
+                let method = $('#outlierMethod').val();
+                let zThreshold = $('#zThreshold').val() || 3;
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'remove_outliers', method: method, z_threshold: zThreshold }),
+                    success: function(response) {
+                        alert(response.message);
+                        updateDataPreview();
+                    }
+                });
+            });
+
+            $('#replaceFileBtn').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/clean_data/',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ action: 'replace_file' }),
+                    success: function(response) {
+                        alert(response.message);
+                    }
+                });
+            });
+
+            $('#refreshPreviewBtn').click(function() {
+                updateDataPreview();
+            });
+
+            // Initial data preview
+            updateDataPreview();
+        });
+    </script>
+</body>
+</html>

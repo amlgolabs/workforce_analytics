@@ -1,0 +1,200 @@
+<h2>Employee Attrition Prediction</h2>
+<style>
+
+
+</style>
+<form method="post" class="prediction-form" id="AP"> 
+    {% csrf_token %}
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="age" name="age" placeholder="Enter age" required>
+        <div class="underline"></div>
+        <label for="age">Age:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="education" name="education" min="1" max="5" placeholder="1-5" required>
+        <div class="underline"></div>
+        <label for="education">Education (1-5):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="overtime" name="overtime">
+            <!-- Placeholder option -->
+            <option value="1">Yes</option>
+            <option value="0">No</option> 
+        </select>
+        <div class="underline"></div>
+        <label for="overtime">Overtime:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="distance" name="distance" placeholder="Enter distance" required>
+        <div class="underline"></div>
+        <label for="distance">Distance From Home:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="environment" name="environment" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="environment">Environment Satisfaction (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="involvement" name="involvement" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="involvement">Job Involvement (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="jobrole_research" name="jobrole_research">
+             <!-- Placeholder option -->
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+        <div class="underline"></div>
+        <label for="jobrole_research">Job Role - Research Scientist:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="jobsatisfaction" name="jobsatisfaction" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="jobsatisfaction">Job Satisfaction (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="gender" name="gender">
+             <!-- Placeholder option -->
+            <option value="1">Male</option>
+            <option value="0">Female</option> 
+        </select>
+        <div class="underline"></div>
+        <label for="gender">Gender:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="businesstravel" name="businesstravel">
+            <!-- Placeholder option -->
+            <option value="1">Travel Frequently</option>
+            <option value="0">Rarely Travel / Don't Travel</option> 
+        </select>
+        <div class="underline"></div>
+        <label for="businesstravel">Business Travel:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="income" name="income" placeholder="Enter income" required>
+        <div class="underline"></div>
+        <label for="income">Monthly Income:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="numcompanies" name="numcompanies" placeholder="Enter number" required>
+        <div class="underline"></div>
+        <label for="numcompanies">Number of Companies Worked:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="stockoption" name="stockoption" min="0" max="3" placeholder="0-3" required>
+        <div class="underline"></div>
+        <label for="stockoption">Stock Option Level (0-3):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="performance" name="performance" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="performance">Performance Rating (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="relationship" name="relationship" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="relationship">Relationship Satisfaction (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="yearsatcompany" name="yearsatcompany" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="yearsatcompany">Years at Company:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="totalworkingyears" name="totalworkingyears" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="totalworkingyears">Total Working Years:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="joblevel" name="joblevel" min="1" max="5" placeholder="1-5" required>
+        <div class="underline"></div>
+        <label for="joblevel">Job Level (1-5):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="worklifebalance" name="worklifebalance" min="1" max="4" placeholder="1-4" required>
+        <div class="underline"></div>
+        <label for="worklifebalance">Work-Life Balance (1-4):</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="yearssincelastpromotion" name="yearssincelastpromotion" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="yearssincelastpromotion">Years Since Last Promotion:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <input type="number" class="form-control" id="yearswithcurrmanager" name="yearswithcurrmanager" placeholder="Enter years" required>
+        <div class="underline"></div>
+        <label for="yearswithcurrmanager">Years with Current Manager:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="jobrole_sales" name="jobrole_sales">
+            <!-- Placeholder option -->
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+        <div class="underline"></div>
+        <label for="jobrole_sales">Job Role - Sales Executive:</label>
+    </div>
+    <div class="form-group col-md-6">
+        <select class="form-control" id="maritalstatus" name="maritalstatus">
+             <!-- Placeholder option -->
+            <option value="1">Single</option>
+            <option value="0">Married/Divorced/Widowed</option> 
+        </select>
+        <div class="underline"></div>
+        <label for="maritalstatus">Marital Status:</label>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Predict</button>
+</form>
+<br>
+<button type="button" onclick="location.href='{% url 'process_csv' %}'" class="btn btn-primary">Download predictions for your file</button>
+
+<div id="predictionModal" class="modal" style="display:none;">
+  <div class="modal-content" style="position: relative; left:340px; top:15px; padding: 20px; max-width:400px; border-radius: 30px; background-color: #f4f4f4; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <span class="close" style="position: relative; top: -10px; left: 180px; font-size: 18px; cursor: pointer;">&times;</span>
+    <p id="predictionResult" style="font-size: 16px; color: #333;"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle form submission
+    document.querySelector('#AP').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this); // Create FormData object from the form
+
+        fetch("{% url 'predict_attrition' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.error) {
+                // Display error if there's an issue with the request
+                document.getElementById('predictionResult').innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+                // Display prediction results
+                const resultText = `Prediction: ${data.prediction ? 'Yes' : 'No'}<br>Probability: ${data.probability.toFixed(3)}%`;
+                document.getElementById('predictionResult').innerHTML = resultText;
+                document.getElementById('predictionModal').style.display = 'block'; // Show the modal
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occurred during fetch
+            console.error('Error:', error);
+            document.getElementById('predictionResult').innerHTML = `<p style="color:red;">An error occurred. Please try again.</p>`;
+        });
+    });
+
+    // Function to close the modal
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('predictionModal').style.display = 'none'; 
+    });
+});
+
+</script>

@@ -1,0 +1,253 @@
+<h2>Percent Salary Hike Recommendations</h2>
+<form method="post" class="prediction-form" id="SHP">
+    {% csrf_token %}
+    <div class="form-group">
+        <input type="number" class="form-control" id="jobinvolvement" name="jobinvolvement" min="1" max="4" placeholder="1-4" required>
+        <label for="jobinvolvement">Job Involvement (1-4):</label>
+    </div>
+    <div class="form-group">
+        <input type="number" class="form-control" id="performancerating" name="performancerating" min="1" max="4" placeholder="1-4" required>
+        <label for="performancerating">Performance Rating (1-4):</label>
+    </div>
+    <div class="form-group">
+        <input type="number" class="form-control" id="trainingtimeslastyear" name="trainingtimeslastyear" placeholder="Enter number" required>
+        <label for="trainingtimeslastyear">Training Times Last Year:</label>
+    </div>
+    <div class="form-group">
+        <input type="number" class="form-control" id="yearsatthecompany" name="yearsatthecompany" placeholder="Enter years" required>
+        <label for="yearsatthecompany">Years at Company:</label>
+    </div>
+    <div class="form-group">
+        <input type="number" class="form-control" id="yearsincurrentrole" name="yearsincurrentrole" placeholder="Enter years" required>
+        <label for="yearsincurrentrole">Years in Current Role:</label>
+    </div>
+    <div class="form-group">
+        <input type="number" class="form-control" id="yearssincelastpromotion" name="yearssincelastpromotion" placeholder="Enter years" required>
+        <label for="yearssincelastpromotion">Years Since Last Promotion:</label>
+    </div>
+    <div class="form-group">
+        <select class="form-control" id="businesstravel" name="businesstravel">
+            <option value="Travel_Frequently">Travel Frequently</option>
+            <option value="Travel_Rarely">Travel Rarely</option>
+            <option value="Non_Travel">Non-Travel</option>
+        </select>
+        <label for="businesstravel">Business Travel:</label>
+    </div>
+    <div class="form-group">
+        <select class="form-control" id="department" name="department">
+            <option value="R&D">Research & Development</option>
+            <option value="Other">Other</option>
+        </select>
+        <label for="department">Department:</label>
+    </div>
+    <div class="form-group">
+        <select class="form-control" id="gender" name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <label for="gender">Gender:</label>
+    </div>
+    <div class="form-group">
+        <select class="form-control" id="jobrole" name="jobrole">
+            <option value="Human Resources">Human Resources</option>
+            <option value="Manager">Manager</option>
+            <option value="Research Scientist">Research Scientist</option>
+            <option value="Sales Representative">Sales Representative</option>
+            <option value="Other">Other</option>
+        </select>
+        <label for="jobrole">Job Role:</label>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Predict</button>
+</form>
+<br>
+<button type="button" onclick="location.href='{% url 'process_csv3' %}'" class="btn btn-primary">Download Predictions for Your File</button>
+
+<div id="predictionModal3" class="modal3" style="display:none;">
+  <div class="modal-content3" style="position: relative; left:340px; top:15px; padding: 20px; max-width:400px; border-radius: 30px; background-color: #f4f4f4; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <span class="close3" style="position: relative; top: -10px; left: 180px; font-size: 18px; cursor: pointer;">&times;</span>
+    <p id="predictionResult3" style="font-size: 16px; color: #333;"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle form submission
+    document.querySelector('#SHP').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this); // Create FormData object from the form
+
+        fetch("{% url 'predict_salary_hike' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.error) {
+                // Display error if there's an issue with the request
+                document.getElementById('predictionResult3').innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+                // Display prediction results
+                const resultText = `Prediction: ${data.prediction}`;
+                console.log(resultText);
+                document.getElementById('predictionResult3').innerHTML = resultText;
+                document.getElementById('predictionModal3').style.display = 'block'; // Show the modal
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occurred during fetch
+            console.error('Error:', error);
+            document.getElementById('predictionResult3').innerHTML = `<p style="color:red;">An error occurred. Please try again.</p>`;
+        });
+    });
+
+    // Function to close the modal
+    document.querySelector('.close3').addEventListener('click', function() {
+        document.getElementById('predictionModal3').style.display = 'none'; 
+    });
+});
+</script>
+
+
+
+{% comment %} <h2>Percent Salary Hike Recommendations</h2>
+<form method="post" class="prediction-form" id="SHP">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="jobinvolvement">Job Involvement (1-4):</label>
+        <input type="number" class="form-control" id="jobinvolvement" name="jobinvolvement" min="1" max="4" placeholder="1-4" required>
+    </div>
+    <div class="form-group">
+        <label for="performancerating">Performance Rating (1-4):</label>
+        <input type="number" class="form-control" id="performancerating" name="performancerating" min="1" max="4" placeholder="1-4" required>
+    </div>
+    <div class="form-group">
+        <label for="trainingtimeslastyear">Training Times Last Year:</label>
+        <input type="number" class="form-control" id="trainingtimeslastyear" name="trainingtimeslastyear" placeholder="Enter number" required>
+    </div>
+    <div class="form-group">
+        <label for="yearsatthecompany">Years at Company:</label>
+        <input type="number" class="form-control" id="yearsatthecompany" name="yearsatthecompany" placeholder="Enter years" required>
+    </div>
+    <div class="form-group">
+        <label for="yearsincurrentrole">Years in Current Role:</label>
+        <input type="number" class="form-control" id="yearsincurrentrole" name="yearsincurrentrole" placeholder="Enter years" required>
+    </div>
+    <div class="form-group">
+        <label for="yearssincelastpromotion">Years Since Last Promotion:</label>
+        <input type="number" class="form-control" id="yearssincelastpromotion" name="yearssincelastpromotion" placeholder="Enter years" required>
+    </div>
+    <div class="form-group">
+        <label for="businesstravel_frequent">Business Travel - Travel Frequently:</label>
+        <select class="form-control" id="businesstravel_frequent" name="businesstravel_frequent">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="businesstravel_rarely">Business Travel - Travel Rarely:</label>
+        <select class="form-control" id="businesstravel_rarely" name="businesstravel_rarely">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="department_research">Department - R&D:</label>
+        <select class="form-control" id="department_research" name="department_research">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="gender_male">Gender - Male:</label>
+        <select class="form-control" id="gender_male" name="gender_male">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="jobrole_human_resources">Job Role - Human Resources:</label>
+        <select class="form-control" id="jobrole_human_resources" name="jobrole_human_resources">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="jobrole_manager">Job Role - Manager:</label>
+        <select class="form-control" id="jobrole_manager" name="jobrole_manager">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="jobrole_research_scientist">Job Role - Research Scientist:</label>
+        <select class="form-control" id="jobrole_research_scientist" name="jobrole_research_scientist">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="jobrole_sales_representative">Job Role - Sales Representative:</label>
+        <select class="form-control" id="jobrole_sales_representative" name="jobrole_sales_representative">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Predict</button>
+</form>
+<br>
+<button type="button" onclick="location.href='{% url 'process_csv3' %}'" class="btn btn-primary">Download Predictions for Your File</button>
+
+<div id="predictionModal3" class="modal3" style="display:none;">
+  <div class="modal-content3" style="position: relative; left:340px; top:15px; padding: 20px; max-width:400px; border-radius: 30px; background-color: #f4f4f4; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    <span class="close3" style="position: relative; top: -10px; left: 180px; font-size: 18px; cursor: pointer;">&times;</span>
+    <p id="predictionResult3" style="font-size: 16px; color: #333;"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle form submission
+    document.querySelector('#SHP').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this); // Create FormData object from the form
+
+        fetch("{% url 'predict_salary_hike' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.error) {
+                // Display error if there's an issue with the request
+                document.getElementById('predictionResult3').innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+                // Display prediction results
+                const resultText = `Salary Hike Prediction: ${data.prediction}`;
+                console.log(resultText);
+                document.getElementById('predictionResult3').innerHTML = resultText;
+                document.getElementById('predictionModal3').style.display = 'block'; // Show the modal
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occurred during fetch
+            console.error('Error:', error);
+            document.getElementById('predictionResult3').innerHTML = `<p style="color:red;">An error occurred. Please try again.</p>`;
+        });
+    });
+
+    // Function to close the modal
+    document.querySelector('.close3').addEventListener('click', function() {
+        document.getElementById('predictionModal3').style.display = 'none'; 
+    });
+});
+</script> {% endcomment %}

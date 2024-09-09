@@ -1,0 +1,29 @@
+{% comment %} <!-- templates/mlapp/data_statistics.html -->
+<div class="container">
+    <h2>Data Head</h2>
+    <form method="get" action="{% url 'data_statistics' %}">
+        <label for="rows_to_display">Show rows:</label>
+        <select name="rows_to_display" id="rows_to_display" onchange="this.form.submit()">
+            <option value="5" {% if rows_to_display == "5" %}selected{% endif %}>5</option>
+            <option value="10" {% if rows_to_display == "10" %}selected{% endif %}>10</option>
+            <option value="30" {% if rows_to_display == "30" %}selected{% endif %}>30</option>
+            <option value="50" {% if rows_to_display == "50" %}selected{% endif %}>50</option>
+            <option value="100" {% if rows_to_display == "50" %}selected{% endif %}>100</option>
+            <option value="500" {% if rows_to_display == "50" %}selected{% endif %}>500</option>
+            <option value="all" {% if rows_to_display == "all" %}selected{% endif %}>All</option>
+        </select>
+    </form>
+    <div class="scrollable">{{ data_head|safe }}</div>
+
+    <h2>Data Info</h2>
+    <pre class="scrollable">{{ data_info }}</pre>
+
+    <h2>Missing Values</h2>
+    <div class="scrollable">{{ missing_values|safe }}</div>
+
+    <h2>Summary Statistics for Numerical Variables</h2>
+    <div class="scrollable">{{ summary_statistics|safe }}</div>
+</div>
+{% comment %}       
+        <a href="{% url 'data_statistics' %}" class="{% if request.path == '/data_statistics/' %}active{% endif %}">Data Statistics</a>
+        <a href="{% url 'clean_data' %}" class="{% if request.path == '/clean_data/' %}active{% endif %}">Clean Data</a> {% endcomment %} {% endcomment %}

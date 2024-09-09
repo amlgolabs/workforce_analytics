@@ -1,0 +1,171 @@
+{% extends 'mlapp/base.html' %}
+{% block title %}AI Assistance - HR Analytics App{% endblock %}
+{% block content %}
+<div class="container" style="width: 1200px; position: absolute; top: 105px; left: 265px;">
+    <!-- Input Section -->
+    <div class="form-group">
+        <label for="user_input">Enter your query here to get help from AI:</label>
+        <input type="text" class="form-control" id="user_input" name="user_input" placeholder="Type here...">
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="form-group">
+        <button type="button" id="filter_code" class="btn btn-success">Get Filter Code</button>
+        <button type="button" id="graph_code" class="btn btn-info">Get Graph Code</button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p>Please wait, AI is processing your request...</p>
+    </div>
+
+    <!-- Display Output Section -->
+    <div class="form-group">
+        <label for="output">Output:</label>
+        <textarea class="form-control" id="output" name="output" rows="10" >{{ output }}</textarea>
+    </div>
+
+    <!-- Run Code Button -->
+    <div class="form-group">
+        <button type="button" id="run_code" class="btn btn-warning">Run Code</button>
+    </div>
+
+    <!-- Container to display results -->
+    <div class="form-group" id="display_results">
+        <p>Result will be displayed here</p>
+    </div>
+
+    <!-- Download Button -->
+    <div class="form-group">
+        <button type="button" id="download_result" class="btn btn-secondary">Download Result</button>
+    </div>
+</div>
+
+<script>
+// Function to update the output field
+function updateOutput(content) {
+    const outputField = document.getElementById('output');
+    outputField.value = content;
+}
+
+// Function to get CSRF token from cookie
+function getCsrfToken() {
+    const csrfToken = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    return csrfToken ? csrfToken.split('=')[1] : '';
+}
+
+
+
+// Run Code
+document.getElementById('run_code').addEventListener('click', async function() {
+    const userCode = document.getElementById('output').value;
+    document.getElementById('loading').style.display = 'block';
+    try {
+        const response = await fetch('/ai/run_code/', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()  // Include CSRF token
+            },
+            body: JSON.stringify({ output: userCode })
+        });
+        const data = await response.json();
+        updateOutput(data.message);
+        displayResults(data.data, data.plot);  // Display the filtered table and plot
+    } catch (error) {
+        console.error('Error:', error);
+        updateOutput('An error occurred.');
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+});
+
+// Function to display the filtered table and plot
+function displayResults(data, plot) {
+    const displayResults = document.getElementById('display_results');
+    displayResults.innerHTML = '';  // Clear previous results
+
+    if (data.length === 0) {
+        displayResults.innerHTML = '<p>No results to display.</p>';
+        return;
+    }
+
+    // Create table
+    let table = '<table class="table table-bordered"><thead><tr>';
+    
+    // Table headers
+    Object.keys(data[0]).forEach(key => {
+        table += `<th>${key}</th>`;
+    });
+    
+    table += '</tr></thead><tbody>';
+    
+    // Table rows
+    data.forEach(row => {
+        table += '<tr>';
+        Object.values(row).forEach(value => {
+            table += `<td>${value}</td>`;
+        });
+        table += '</tr>';
+    });
+    
+    table += '</tbody></table>';
+    
+    // Add table to display results
+    displayResults.innerHTML += table;
+
+    // Display plot if available
+    if (plot) {
+        const img = document.createElement('img');
+        img.src = `data:image/png;base64,${plot}`;
+        img.alt = 'Plot';
+        img.style.width = '100%';  // Adjust width as needed
+        displayResults.appendChild(img);
+    }
+}
+
+// Function to run AI code
+async function runAiCode(endpoint) {
+    const userInput = document.getElementById('user_input').value;
+    document.getElementById('loading').style.display = 'block';
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()  // Include CSRF token
+            },
+            body: JSON.stringify({ question: userInput })
+        });
+        const data = await response.json();
+        updateOutput(data.result);
+        displayResults(data.data, data.plot);  // Display the filtered table and plot
+    } catch (error) {
+        console.error('Error:', error);
+        updateOutput('An error occurred.');
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+}
+
+
+// Get Filter Code
+document.getElementById('filter_code').addEventListener('click', function() {
+    runAiCode('/ai/filter/');
+});
+
+// Get Graph Code
+document.getElementById('graph_code').addEventListener('click', function() {
+    runAiCode('/ai/graph/');
+});
+
+
+// Download Result
+document.getElementById('download_result').addEventListener('click', function() {
+    window.location.href = '/ai/?download_result=true'; // Trigger the download by sending a GET request
+});
+</script>
+{% endblock %}

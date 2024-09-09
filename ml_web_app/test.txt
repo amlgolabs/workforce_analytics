@@ -1,0 +1,36 @@
+ml_web_app/
+├── mlapp/
+│   ├── templates/
+│   │   ├── mlapp/
+│   │   │   ├──data_statistics.html
+│   │   │   ├──attrition_prediction.html
+│   │   │   ├──performance_prediction.html
+│   │   │   ├──salary_hike_recommendation.html
+│   │   │   ├──upload_file.html
+│   │   │   ├──detailed_eda.html
+│   │   │   ├──clean_data.html
+│   │   │   └── home.html #and some more html files
+│   │   └── registration/
+│   │       ├─registration.html
+│   │       └── login.html 
+│   ├── static/
+│   │   └── mlapp/
+│   │       ├──file.csv
+│   │       ├──logo.bmp
+│   │       ├──logo.png
+│   │       └── and many more
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── tests.py
+│   └── views.py
+├── ml_web_app/
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── db.sqlite3
+└── manage.py

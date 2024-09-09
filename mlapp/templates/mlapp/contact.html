@@ -1,0 +1,21 @@
+<!-- contact.html -->
+{% extends 'mlapp/base.html' %}
+{% block title %}Contact Us{% endblock %}
+{% block content %}
+<div class="container">
+    
+    <p>
+        Have questions or feedback? Please feel free to reach out to us using the form below.
+    </p>
+
+    <h2>Contact Us</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    
+</div>
+
+
+{% endblock %}

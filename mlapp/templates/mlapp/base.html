@@ -1,0 +1,495 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.botpress.cloud/webchat/v2/inject.js"></script>
+    <script src="https://mediafiles.botpress.cloud/8f90402a-1a6d-4a6b-bb0e-49c0bd14520a/webchat/v2/config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Analytics App</title>
+    <link rel="stylesheet" href="{% static 'mlapp/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+              @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+              body, html {
+                  margin: 0;
+                  padding: 0;
+                  font-family: 'Poppins', sans-serif;
+                  background-color: #003d79;
+              }
+       
+       
+       
+          .container {
+              background-color: #fff;
+              border-radius: 10px;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+              padding-left: 40px;
+              padding-right: 40px;
+              padding-bottom: 20px; /* Added padding-bottom to maintain consistency */
+              width: auto; /* Adjust width as per your design */
+              max-width: 1200px;
+              margin: auto;
+              text-align: center;
+          }
+       
+          h2, h3 {color: #333;}
+       
+          p {
+              line-height: 1.6;
+              margin-bottom: 20px;
+          }
+       
+          /* Form Styles */
+          input[type="text"],
+          input[type="email"],
+          textarea {
+              width: 100%;
+              padding: 15px;
+              margin: 5px 0 20px 0;
+              border: none;
+              background-color: #eee;
+              border-radius: 5px;
+              box-sizing: border-box;
+          }
+       
+          input[type="text"]:focus,
+          input[type="email"]:focus,
+          textarea:focus {
+              outline: none;
+              background-color: #e8e8e8;
+          }
+       
+              button {
+                  background-color: #003d79;
+                  color: white;
+                  padding: 15px 20px;
+                  border: none;
+                  cursor: pointer;
+                  width: 100%;
+                  opacity: 0.9;
+                  border-radius: 5px;
+                  box-sizing: border-box;
+              }
+       
+              button:hover {
+                  opacity: 1;
+              }
+       
+              nav {
+                  background-color: #333;
+                  color: #fff;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 1em;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  z-index: 10;
+              }
+       
+              body {
+                  padding-top: 20px;
+              }
+       
+       
+              nav a {
+                  color: #fff;
+                  text-decoration: none;
+                  margin: 0 1em;
+                  padding: 0.5em;
+              }
+       
+              nav a:hover {
+                  background-color: #555;
+              }
+       
+              .right-nav {
+                 
+                  display: flex;
+                  align-items: center;
+              }
+       
+              .left-nav {
+                 
+                  display: flex;
+                  align-items: center;
+              }
+             
+              /* Sidebar Navigation */
+              {% if user.is_authenticated %}
+                  .sidebar {
+                  height: 100%;
+                  {% comment %} width:0px; {% endcomment %}
+                  width: 250px;
+                  position: fixed;
+                  top: 60px;
+                  left: 0;
+                  background-color: #d1d1d1;
+                  overflow-x: hidden;
+                  padding-top: 20px;
+                  }
+                  .content {
+                  margin-left: 250px;
+                  padding: 0px 10px;
+                  padding-top: 60px;
+              }
+              {% else %}
+                  .sidebar {
+                  height: 100%;
+                  width: 00px;
+                  position: fixed;
+                  top: 60px;
+                  left: 0;
+                  background-color: #d1d1d1;
+                  overflow-x: hidden;
+                  padding-top: 0px;
+                  }
+                  .content {
+                  margin-left: 0px;
+                  padding: 0px 10px;
+                  padding-top: 60px;
+                  }
+      {% endif %}
+                   /* Top Title Bar Styles */
+              .topbar {
+                  height: 60px;
+                  background-color: #0f1c24 ;
+                  color: #fff;
+                  position: fixed;
+                  top: 0;
+                  left: 0px;
+                  right: 0;
+                  z-index: 1000;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 0 20px;
+                  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+              }
+       
+              .topbar .logo {
+                  display: flex;
+                  align-items: center;
+              }
+       
+              .topbar .logo img {
+                  height: 35px;
+                  margin-right: 10px;
+              }
+       
+              .topbar .user-info {
+                  display: flex;
+                  align-items: center;
+                  color: white;
+              }
+       
+              .topbar .user-info span {
+                  margin-right: 15px;
+              }
+       
+              .topbar .user-info img {
+                  height: 35px;
+                  border-radius: 50%;
+              }
+       
+              /* Sidebar Styles */
+              .sidebar {
+                  height: 100%;
+                  width: 250px;
+                  position: fixed;
+                  top: 55px;
+                  left: 0;
+                  background-color: #273140;
+                  padding-top: 20px;
+                  overflow-y: auto;
+              }
+       
+              .sidebar a {
+                  display: block;
+                  color: white;
+                  padding: 16px;
+                  text-decoration: none;
+                  font-size: 14px;
+              }
+       
+              .sidebar a.active, .sidebar a:hover {
+                  background-color: #007bff;
+                  color: white;
+              }
+       
+             /* Additional styling */
+              .sidebar hr {
+                  border-top: 1px solid #394451;
+                  margin: 10px 0;
+              }
+                 
+              /* Scrollable containers */
+              .scrollable {
+                  max-height: 650px;
+                  overflow-y: auto;
+                  overflow-x: auto;
+                  border: 1px solid #ccc;
+                  padding: 10px;
+                  margin-bottom: 20px;
+              }
+             
+              /* Table styling */
+              table.table {
+                  width: 100%;
+                  border-collapse: collapse;
+              }
+             
+              table.table th,
+              table.table td {
+                  padding: 8px;
+                  text-align: left;
+                  border: 1px solid #ddd;
+              }
+             
+              table.table th {
+                  background-color: #f2f2f2;
+              }
+             
+              table.table-striped tbody tr:nth-of-type(odd) {
+                  background-color: #f9f9f9;
+              }
+             
+              table.table-striped tbody tr:nth-of-type(even) {
+                  background-color: #ffffff;
+              }
+             
+              table.table-bordered {
+                  border: 1px solid #ddd;
+              }
+             
+              table.table-bordered th,
+              table.table-bordered td {
+                  border: 1px solid #ddd !important;
+              }
+             
+              .tab-content {
+                  border: 1px solid #ddd;
+                  border-top: none;
+                  padding: 15px;
+              }
+             
+              .img-fluid {
+                  max-width: 100%;
+                  height: auto;
+              }
+             
+              /* Sub-navigation bar */
+              .sub-nav .nav-pills .nav-link {
+                  margin-right: 10px;
+                  border-radius: 0;
+              }
+             
+              .sub-nav .nav-pills .nav-link.active {
+                  background-color: #007bff;
+                  color: #fff;
+              }
+             
+      .container .form-group {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+             
+      .container .form-group .form-control {
+          width: auto;
+          display: inline-block;
+      }
+       
+      .container .form-group .col-form-label {
+          white-space: nowrap;
+          margin-right: 10px;
+      }
+       
+      /* Specific CSS for the attrition prediction form */
+      .analysis-content {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+      }
+       
+      .analysis-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+       
+      .analysis-content .prediction-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+       
+      .analysis-content .form-group {
+        width: calc(50% - 10px);
+        margin-bottom: 20px;
+      }
+       
+      .analysis-content .form-group label {
+        font-size: 16px;
+        margin-bottom: 8px;
+        display: block;
+        color: #333;
+      }
+       
+      .analysis-content .form-group .form-control {
+        width: 350px;
+        padding: 10px;
+        position:relative;
+        left:60px;
+        align-item:center;
+        border: 2px solid #d3d3d3;
+        border-radius: 25px;
+        font-size: 16px;
+        color: #333;
+        height: 45px;
+      }
+       
+      .analysis-content .form-group .col-form-label {
+        white-space: nowrap;
+        margin-right: 10px;
+      }
+       
+      @media (max-width: 700px) {
+        #attrition-prediction-content .form-group {
+          width: 100%;
+        }
+      }
+       
+      .analysis-content .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #003d79;
+        color: white;
+        opacity=0.9;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+       
+      .analysis-content .btn-primary:hover {
+        opacity=1
+      }
+       
+      .close {
+         color: #aaa;
+          font-size: 28px;
+          font-weight: bold;
+      }
+       
+      .close:hover,
+      .close:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+      }
+       
+      </style>
+       
+</head>
+<body>
+    <!-- Sidebar -->
+    {% if user.is_authenticated %}
+    <div class="sidebar">
+        <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{% url 'detailed_eda' %}" class="{% if request.path == '/detailed_eda/' %}active{% endif %}">
+            <i class="fas fa-chart-bar"></i> Graphical Analysis
+        </a>
+        <a href="{% url 'advanced_analysis' %}" class="{% if request.path == '/advanced_analysis/' %}active{% endif %}">
+            <i class="fas fa-layer-group"></i> Advanced Analysis
+        </a>
+        <a href="{% url 'predictions' %}" class="{% if request.path == '/predictions/' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> Predictions
+        </a>
+        <a href="{% url 'ai' %}" class="{% if request.path == '/ai/' %}active{% endif %}">
+            <i class="fas fa-robot"></i> AI Assistance
+        </a>
+        <a href="{% url 'upload_file' %}" class="{% if request.path == '/upload_file/' %}active{% endif %}">
+            <i class="fas fa-upload"></i> Upload Your Own File
+        </a>
+        <a href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+    {% endif %}
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'mlapp/logo.png' %}" alt="Logo">
+            <span style="font-size: 20px; font-weight: bold; position: relative; left: 10px;">Work Force Analytics</span>
+        </div>
+        <div class="user-info">
+            <span class="user-name">{{ user.username }}</span>
+            <img src="{% static 'mlapp/Ankit.png' %}" alt="User Avatar">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Notification Banner -->
+        {% comment %} <div class="notification-banner">
+            <span>Payroll submission for the current pay period is due in 2 days. Review and finalize all employee payroll details.</span>
+            <span class="more-details">More Details</span>
+        </div> {% endcomment %}
+
+        {% comment %} <div class="notification-banner">
+            <span id="notification-message"></span>
+            <span class="more-details">More Details</span>
+        </div>
+    
+        <script>
+            function getDueDate() {
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const dueDate = new Date(today.getFullYear(), currentMonth, 30);
+    
+                if (today.getDate() > 30) {
+                    dueDate.setMonth(currentMonth + 1); // Move to next month if today is after the 30th
+                    dueDate.setDate(30);
+                }
+    
+                return dueDate;
+            }
+    
+            function daysBetween(date1, date2) {
+                const oneDay = 24 * 60 * 60 * 1000;
+                return Math.round((date2 - date1) / oneDay);
+            }
+    
+            const today = new Date();
+            const dueDate = getDueDate();
+            const daysRemaining = daysBetween(today, dueDate);
+    
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const formattedDueDate = dueDate.toLocaleDateString(undefined, options);
+    
+            const message = `Payroll submission for the current pay period is due on ${formattedDueDate}. Review and finalize all employee payroll details. ${daysRemaining} days remaining.`;
+            document.getElementById('notification-message').textContent = message;
+        </script> {% endcomment %}
+
+        <!-- Action Buttons -->
+        {% comment %} <div class="action-buttons">
+            <input type="text" placeholder="Search anything...">
+            <button><i class="fas fa-file-export"></i> Export</button>
+            <button><i class="fas fa-plus"></i> New Payroll</button>
+        </div> {% endcomment %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
