@@ -33,6 +33,7 @@ import itertools
 from statsmodels.graphics.mosaicplot import mosaic
 
 
+
 logger = logging.getLogger(__name__)
 
 def contact(request):
@@ -1237,8 +1238,12 @@ def process_csv3(request):
     
     return response
 
+def update_profile(request):
+    return render(request, 'mlapp/update_profile.html')
+
 def salary_hike_recommendation(request):
     return render(request, 'mlapp/salary_hike_recommendation.html')
+
 def predictions(request):
     return render(request, 'mlapp/predictions.html')
 
@@ -1256,7 +1261,7 @@ from typing import List, Tuple
 from langchain.schema import Document
 
 # Initialize Ollama LLM
-ollama_llm = Ollama(model='llama3:latest')
+ollama_llm = Ollama(model='llama3.1:latest')
 
 base_dir = os.path.join(settings.STATICFILES_DIRS[0], 'mlapp')
 
@@ -1316,59 +1321,11 @@ vector_storage = FAISS(
 # Get retriever
 retriever = vector_storage.as_retriever()
 # Define the prompt template for filtering
-filter_template = ("""
-You need to return the python code only to filter the data from a dataframe named df having these columns: Age, Attrition, BusinessTravel, DailyRate, Department, DistanceFromHome, Education, EducationField, EmployeeCount, EmployeeNumber, EnvironmentSatisfaction, Gender, HourlyRate, JobInvolvement, JobLevel, JobRole, JobSatisfaction, MaritalStatus, MonthlyIncome, MonthlyRate, NumCompaniesWorked, Over18, OverTime, PercentSalaryHike, PerformanceRating, RelationshipSatisfaction, StandardHours, StockOptionLevel, TotalWorkingYears, TrainingTimesLastYear, WorkLifeBalance, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager.
+filter_template = """
+You are a Python data analysis assistant. Your task is to generate a single line of Python code to filter a DataFrame named 'df' based on the user's question. The DataFrame contains employee data with the following columns:
 
-The dataset contains the following key features: 
-- Age: The age of the employee.
-- Attrition: Indicates whether the employee has left the company (Yes/No).
-- BusinessTravel: Frequency of travel for business purposes (Non-Travel, Travel_Rarely, Travel_Frequently).
-- DailyRate: The daily rate of pay for the employee.
-- Department: The department where the employee works (Sales, Research & Development, Human Resources).
-- DistanceFromHome: The distance between the employee's home and workplace.
-- Education: The education level of the employee (1 to 5).
-- EducationField: The field in which the employee received their education (Life Sciences, Medical, Marketing, Technical Degree, etc.).
-- EnvironmentSatisfaction: Employee's satisfaction with their work environment (1 to 4).
-- Gender: Gender of the employee (Male/Female).
-- HourlyRate: The hourly rate of pay for the employee.
-- JobInvolvement: Employee's involvement in their job (1 to 4).
-- JobLevel: The job level of the employee (1 to 5).
-- JobRole: The role of the employee within the organization (Sales Executive, Research Scientist, Laboratory Technician, etc.).
-- JobSatisfaction: Employee's satisfaction with their job (1 to 4).
-- MaritalStatus: The marital status of the employee (Single, Married, Divorced).
-- MonthlyIncome: The monthly income of the employee.
-- MonthlyRate: The monthly rate of pay for the employee.
-- NumCompaniesWorked: The number of companies the employee has worked for.
-- OverTime: Whether the employee works overtime (Yes/No).
-- PercentSalaryHike: The percentage increase in salary over the last year.
-- PerformanceRating: The performance rating of the employee (1 to 4).
-- RelationshipSatisfaction: Employee's satisfaction with their relationships at work (1 to 4).
-- StockOptionLevel: The stock option level of the employee (0 to 3).
-- TotalWorkingYears: The total number of years the employee has worked.
-- TrainingTimesLastYear: The number of times the employee underwent training in the last year.
-- WorkLifeBalance: Employee's work-life balance rating (1 to 4).
-- YearsAtCompany: The number of years the employee has worked at the current company.
-- YearsInCurrentRole: The number of years the employee has been in their current role.
-- YearsSinceLastPromotion: The number of years since the employee's last promotion.
-- YearsWithCurrManager: The number of years the employee has worked with their current manager.
+Age, Attrition, BusinessTravel, DailyRate, Department, DistanceFromHome, Education, EducationField, EmployeeCount, EmployeeNumber, EnvironmentSatisfaction, Gender, HourlyRate, JobInvolvement, JobLevel, JobRole, JobSatisfaction, MaritalStatus, MonthlyIncome, MonthlyRate, NumCompaniesWorked, Over18, OverTime, PercentSalaryHike, PerformanceRating, RelationshipSatisfaction, StandardHours, StockOptionLevel, TotalWorkingYears, TrainingTimesLastYear, WorkLifeBalance, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager
 
-
-
-you can return only a single line of code as per the requirement and not a single word apart from that like
-
-<question:>
-Employees with salary greater than 10k?
-<output:> 
-df[df['MonthlyIncome'] > 10000]
-
-Context:{context}
-Question:{question}
-""")
-
-
-
-graph_template = ("""
-You need to return the python code only to graphically represent the filtered data from a dataframe named df having these columns: Age,	Attrition,	BusinessTravel,	DailyRate,	Departmen,	DistanceFromHome,	Education,	EducationField,	EmployeeCount,	EmployeeNumber,	EnvironmentSatisfaction,	Gender,	HourlyRate,	JobInvolvement,	JobLevel,	JobRole,	JobSatisfaction,	MaritalStatus,	MonthlyIncome,	MonthlyRate	NumCompaniesWorked,	Over18,	OverTime,	PercentSalaryHike,	PerformanceRating,	RelationshipSatisfaction,	StandardHours,	StockOptionLevel,	TotalWorkingYears,	TrainingTimesLastYear,	WorkLifeBalance,	YearsAtCompany,	YearsInCurrentRole,	YearsSinceLastPromotion,	YearsWithCurrManager
 The dataset contains the following key features:
 
 Age: The age of the employee.
@@ -1403,86 +1360,118 @@ Years in Current Role: The number of years the employee has been in their curren
 Years Since Last Promotion: The number of years since the employee's last promotion.
 Years with Current Manager: The number of years the employee has worked with their current manager.
 
+Key points to remember:
+1. Return ONLY the Python code, without any explanations or additional text.
+2. The code should be a single line that can be directly executed.
+3. Use proper Python syntax and DataFrame operations.
+4. Ensure the code is efficient and follows best practices for pandas operations.
+5. If multiple conditions are needed, use bitwise operators (&, |) instead of 'and', 'or' and don't forget to include the conditions in the brackets like (condition1) & (condition2), i repeat, don't forget to include the conditions in the brackets this is important.
+6. Handle potential errors, such as non-existent columns or invalid comparisons.
 
-if only one column is specified then plot it's frequency on the y axis and the filtered data on x-axis
-just return the python code with a single plt.show() and assume that i have already imported the required libraries, don't return a single word other then the required python code.
+Examples:
 
-<Example:>
+Question: Employees with salary greater than 10k?
+Answer: df[df['MonthlyIncome'] > 10000]
 
-<question:> 
+Question: Female employees in the Sales department?
+Answer: df[(df['Gender'] == 'Female') & (df['Department'] == 'Sales')]
 
-Female Employees
+Question: Employees with high job satisfaction and low attrition?
+Answer: df[(df['JobSatisfaction'] >= 3) & (df['Attrition'] == 'No')]
+
+Context: {context}
+Question: {question}
+
+Remember, provide only the code, nothing else.
+"""
 
 
-<answer:>
+graph_template = """
+You are a Python data visualization expert. Your task is to generate Python code to create a meaningful graph based on the user's question using a DataFrame named 'df'. The DataFrame contains employee data with the following columns:
 
-# Filter data for female employees
-female_df = df[df['Gender'] == 'Female']
+Age, Attrition, BusinessTravel, DailyRate, Department, DistanceFromHome, Education, EducationField, EmployeeCount, EmployeeNumber, EnvironmentSatisfaction, Gender, HourlyRate, JobInvolvement, JobLevel, JobRole, JobSatisfaction, MaritalStatus, MonthlyIncome, MonthlyRate, NumCompaniesWorked, Over18, OverTime, PercentSalaryHike, PerformanceRating, RelationshipSatisfaction, StandardHours, StockOptionLevel, TotalWorkingYears, TrainingTimesLastYear, WorkLifeBalance, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager
+The dataset contains the following features:
 
-# Plot frequency of gender
-plt.hist(female_df['Gender'], bins=2, edgecolor='black')
-plt.xlabel('Gender')
+Age: The age of the employee.
+Attrition: Indicates whether the employee has left the company (Yes/No).
+Business Travel: Frequency of travel for business purposes (Non-Travel, Travel_Rarely, Travel_Frequently).
+Daily Rate: The daily rate of pay for the employee.
+Department: The department where the employee works (Sales, Research & Development, Human Resources).
+Distance from Home: The distance between the employee's home and workplace.
+Education: The education level of the employee (1 to 5).
+Education Field: The field in which the employee received their education (Life Sciences, Medical, Marketing, Technical Degree, etc.).
+Environment Satisfaction: Employee's satisfaction with their work environment (1 to 4).
+Gender: Gender of the employee (Male/Female).
+Hourly Rate: The hourly rate of pay for the employee.
+Job Involvement: Employee's involvement in their job (1 to 4).
+Job Level: The job level of the employee (1 to 5).
+Job Role: The role of the employee within the organization (Sales Executive, Research Scientist, Laboratory Technician, etc.).
+Job Satisfaction: Employee's satisfaction with their job (1 to 4).
+Marital Status: The marital status of the employee (Single, Married, Divorced).
+Monthly Income: The monthly income of the employee.
+Monthly Rate: The monthly rate of pay for the employee.
+Num Companies Worked: The number of companies the employee has worked for.
+Overtime: Whether the employee works overtime (Yes/No).
+Percent Salary Hike: The percentage increase in salary over the last year.
+Performance Rating: The performance rating of the employee (1 to 4).
+Relationship Satisfaction: Employee's satisfaction with their relationships at work (1 to 4).
+Stock Option Level: The stock option level of the employee (0 to 3).
+Total Working Years: The total number of years the employee has worked.
+Training Times Last Year: The number of times the employee underwent training in the last year.
+Work Life Balance: Employee's work-life balance rating (1 to 4).
+Years at Company: The number of years the employee has worked at the current company.
+Years in Current Role: The number of years the employee has been in their current role.
+Years Since Last Promotion: The number of years since the employee's last promotion.
+Years with Current Manager: The number of years the employee has worked with their current manager.
+
+
+Key points to remember:
+1. Return ONLY the Python code, without any explanations or additional text.
+2. Use matplotlib.pyplot as plt for plotting.
+3. Always include proper labels for axes and a title for the graph.
+4. Choose an appropriate graph type based on the data and question (e.g., bar plot, histogram, scatter plot, box plot).
+5. If filtering is required, include the filtering code before plotting.
+6. If multiple conditions are needed for filtering, use bitwise operators (&, |) instead of 'and', 'or' and don't forget to include the conditions in the brackets like (condition1) & (condition2).
+7. For categorical data, consider using bar plots or pie charts.
+8. For numerical data, consider using histograms, scatter plots, or box plots.
+9. Use color to enhance the readability of the graph when appropriate.
+10. Include a single plt.show() at the end of your code.
+11. Assume all necessary libraries are already imported.
+
+Examples:
+
+Question: Distribution of employee ages?
+Answer:
+plt.hist(df['Age'], bins=20, edgecolor='black')
+plt.xlabel('Age')
 plt.ylabel('Frequency')
-plt.title('Distribution of Female Employees')
+plt.title('Distribution of Employee Ages')
 plt.show()
 
+Question: Job satisfaction across departments?
+Answer:
+dept_satisfaction = df.groupby('Department')['JobSatisfaction'].mean()
+plt.bar(dept_satisfaction.index, dept_satisfaction.values)
+plt.xlabel('Department')
+plt.ylabel('Average Job Satisfaction')
+plt.title('Job Satisfaction Across Departments')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
-Context:{context}
-Question:{question}
-""")
+Question: Relationship between years at company and monthly income?
+Answer:
+plt.scatter(df['YearsAtCompany'], df['MonthlyIncome'])
+plt.xlabel('Years at Company')
+plt.ylabel('Monthly Income')
+plt.title('Years at Company vs Monthly Income')
+plt.show()
 
+Context: {context}
+Question: {question}
 
-def ai(request):
-    user_input = ''
-    user_code = ''
-    ai_code = ''
-    ai_graph_code = ''
-    output = ''
-    file_path = os.path.join(settings.STATICFILES_DIRS[0], 'mlapp', 'file.csv')
-
-    if request.method == 'POST':
-        user_input = request.POST.get('user_input', '')
-        if 'add_string' in request.POST:
-            user_code = user_input
-        elif 'ai_filter_code' in request.POST:
-            question = user_input
-            try:
-                # Generate AI filtering code
-                result = filter_chain.invoke({"question": question})
-                ai_code = result["output"]
-            except Exception as e:
-                ai_code = str(e)
-        elif 'ai_graph_code' in request.POST:
-            question = user_input
-            try:
-                # Generate AI graph plotting code
-                result = graph_chain.invoke({"question": question})
-                ai_graph_code = result["output"]
-            except Exception as e:
-                ai_graph_code = str(e)
-        elif 'run_code' in request.POST:
-            try:
-                df = pd.read_csv(file_path)
-                # Combine user_code and ai_code/ai_graph_code to execute
-                exec(user_code + '\n' + ai_code)
-                exec(user_code + '\n' + ai_graph_code)
-            except Exception as e:
-                output = str(e)
-            else:
-                output = "Code executed successfully!"
-        elif 'download_result' in request.POST:
-            response = HttpResponse(content_type='application/octet-stream')
-            response['Content-Disposition'] = 'attachment; filename=result.csv'
-            df.to_csv(response, index=False)
-            return response
-
-    return render(request, 'mlapp/ai.html', {
-        'user_input': user_input,
-        'user_code': user_code,
-        'ai_code': ai_code,
-        'ai_graph_code': ai_graph_code,
-        'output': output,
-    })
+Remember, provide only the code, nothing else.
+"""
 
 @csrf_exempt
 def ai_filter(request):
@@ -1520,59 +1509,148 @@ def ai_graph(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
-
 @csrf_exempt
 def run_code(request):
-    df=pd.read_csv(os.path.join(settings.STATICFILES_DIRS[0], 'mlapp', 'file.csv'))
     if request.method == 'POST':
+        data = json.loads(request.body)
+        code = data.get('code')
+        
+        # Set up the environment for code execution
+        file_path = os.path.join(settings.STATICFILES_DIRS[0], 'mlapp', 'file.csv')
+        df = pd.read_csv(file_path)
+        
+        # Capture output
+        output = io.StringIO()
+        result_type = 'text'
+        result_data = None
+        
         try:
-            # Get user code from request
-            user_code = json.loads(request.body).get('output', '')
-
-            # Create a context for exec to run user code
-            context = {'df': df, 'plt': plt}
+            # Create a local namespace for execution
+            local_vars = {'df': df, 'plt': plt}
             
-            # Execute the user code within the context
-            exec(user_code, globals(), context)
-
-            # Extract filtered DataFrame if it exists in context
-            filtered_df = context.get('df', df)
-
-            # Convert DataFrame to JSON
-            data = filtered_df.to_dict(orient='records')
+            # Execute the code
+            if '\n' in code:
+                # Multi-line code
+                exec(code, globals(), local_vars)
+                if plt.get_fignums():
+                    img = io.BytesIO()
+                    plt.savefig(img, format='png')
+                    img.seek(0)
+                    plot_url = base64.b64encode(img.getvalue()).decode()
+                    output.write(f'<img src="data:image/png;base64,{plot_url}">')
+                    plt.close()
+                    result_type = 'image'
+                    result_data = plot_url
+            else:
+                # Single-line code
+                result = eval(code, globals(), local_vars)
+                if isinstance(result, pd.DataFrame):
+                    html_table = result.to_html(classes=['table', 'table-striped', 'table-bordered', 'table-hover', 'table-responsive'])
+                    output.write(html_table)
+                    result_type = 'table'
+                    result_data = result.to_csv(index=False)
+                else:
+                    output.write(str(result))
             
-            # Get plot image if plt is used
-            plot_image = None
-            if 'plt' in context and hasattr(context['plt'], 'savefig'):
-                buf = BytesIO()
-                context['plt'].savefig(buf, format='png')
-                buf.seek(0)
-                plot_image = base64.b64encode(buf.read()).decode('utf-8')
-                buf.close()
-                plt.close()  # Close the figure to avoid excessive memory usage
-
-            result = {
-                'message': 'Code executed successfully!',
-                'data': data,
-                'plot': plot_image
-            }
-        except json.JSONDecodeError:
-            result = {
-                'message': 'Invalid JSON',
-                'data': [],
-                'plot': None
-            }
+            # Check for any created DataFrames in local_vars
+            for var_name, var_value in local_vars.items():
+                if var_name != 'df' and isinstance(var_value, pd.DataFrame):
+                    html_table = var_value.head(50).to_html(classes=['table', 'table-striped', 'table-bordered', 'table-hover', 'table-responsive'])
+                    output.write(f"<h3>{var_name}:</h3>")
+                    output.write(html_table)
+                    result_type = 'table'
+                    result_data = var_value.to_csv(index=False)
+            
+            if not output.getvalue():
+                output.write("Code executed successfully, but no output was generated.")
+            
         except Exception as e:
-            result = {
-                'message': str(e),
-                'data': [],
-                'plot': None
-            }
+            output.write(str(e))
+        
+        return JsonResponse({
+            'output': output.getvalue(),
+            'result_type': result_type,
+            'result_data': result_data
+        })
+    
+    return JsonResponse({'error': 'Invalid request method'})
 
-        return JsonResponse(result)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+@csrf_exempt
+def download_result(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        result_type = data.get('result_type')
+        result_data = data.get('result_data')
+        
+        if result_type == 'table':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="filtered_data.csv"'
+            response.write(result_data)
+        elif result_type == 'image':
+            response = HttpResponse(content_type='image/png')
+            response['Content-Disposition'] = 'attachment; filename="plot.png"'
+            response.write(base64.b64decode(result_data))
+        else:
+            return JsonResponse({'error': 'Invalid result type'})
+        
+        return response
+    
+    return JsonResponse({'error': 'Invalid request method'})
+
+
+
+
+# @csrf_exempt
+# def run_code(request):
+#     df=pd.read_csv(os.path.join(settings.STATICFILES_DIRS[0], 'mlapp', 'file.csv'))
+#     if request.method == 'POST':
+#         try:
+#             # Get user code from request
+#             user_code = json.loads(request.body).get('output', '')
+
+#             # Create a context for exec to run user code
+#             context = {'df': df, 'plt': plt}
+            
+#             # Execute the user code within the context
+#             exec(user_code, globals(), context)
+
+#             # Extract filtered DataFrame if it exists in context
+#             filtered_df = context.get('df', df)
+
+#             # Convert DataFrame to JSON
+#             data = filtered_df.to_dict(orient='records')
+            
+#             # Get plot image if plt is used
+#             plot_image = None
+#             if 'plt' in context and hasattr(context['plt'], 'savefig'):
+#                 buf = BytesIO()
+#                 context['plt'].savefig(buf, format='png')
+#                 buf.seek(0)
+#                 plot_image = base64.b64encode(buf.read()).decode('utf-8')
+#                 buf.close()
+#                 plt.close()  # Close the figure to avoid excessive memory usage
+
+#             result = {
+#                 'message': 'Code executed successfully!',
+#                 'data': data,
+#                 'plot': plot_image
+#             }
+#         except json.JSONDecodeError:
+#             result = {
+#                 'message': 'Invalid JSON',
+#                 'data': [],
+#                 'plot': None
+#             }
+#         except Exception as e:
+#             result = {
+#                 'message': str(e),
+#                 'data': [],
+#                 'plot': None
+#             }
+
+#         return JsonResponse(result)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 # Chain components together (assuming these are already defined elsewhere in your code)
@@ -1582,13 +1660,55 @@ filter_chain = RunnableParallel(context=retriever, question=RunnablePassthrough(
 graph_prompt = PromptTemplate.from_template(template=graph_template)
 graph_chain = RunnableParallel(context=retriever, question=RunnablePassthrough()) | graph_prompt | ollama_llm | StrOutputParser()
 
-# Assuming you're using a simple pass-through, you can directly pass the values
+# # Define the prompt templates
+# filter_prompt = PromptTemplate.from_template(template=filter_template)
+# graph_prompt = PromptTemplate.from_template(template=graph_template)
+
+# # Chain components together
+# filter_chain = RunnableParallel(context=retriever, question=RunnablePassthrough()) | filter_prompt | ollama_llm | StrOutputParser()
+# graph_chain = RunnableParallel(context=retriever, question=RunnablePassthrough()) | graph_prompt | ollama_llm | StrOutputParser()
+
+# ... (previous code remains the same)
+
 def generate_ai_graph_code(user_input):
-    # Assuming you're using the graph_chain directly
-    result = graph_chain.invoke({"context": retriever, "question": user_input})
-    return result["output"]
+    try:
+        result = graph_chain.invoke({"context": retriever, "question": user_input})
+        return str(result)  # Convert the result to a string, regardless of its type
+    except Exception as e:
+        return f"Error generating graph code: {str(e)}"
 
 def generate_ai_filter_code(user_input):
-    # Assuming you're using the filter_chain directly
-    result = filter_chain.invoke({"context": retriever, "question": user_input})
-    return result["output"]
+    try:
+        result = filter_chain.invoke({"context": retriever, "question": user_input})
+        return str(result)  # Convert the result to a string, regardless of its type
+    except Exception as e:
+        return f"Error generating filter code: {str(e)}"
+
+def ai(request):
+    if request.method == 'POST':
+        user_input = request.POST.get('user_input')
+        action = request.POST.get('action')
+        
+        if action == 'filter':
+            ai_response = generate_ai_filter_code(user_input)
+        elif action == 'plot':
+            ai_response = generate_ai_graph_code(user_input)
+        else:
+            ai_response = "Invalid action"
+        
+        return render(request, 'mlapp/ai.html', {'ai_response': ai_response})
+    
+    return render(request, 'mlapp/ai.html')
+
+# ... (rest of the code remains the same)
+
+# # Assuming you're using a simple pass-through, you can directly pass the values
+# def generate_ai_graph_code(user_input):
+#     # Assuming you're using the graph_chain directly
+#     result = graph_chain.invoke({"context": retriever, "question": user_input})
+#     return result["output"]
+
+# def generate_ai_filter_code(user_input):
+#     # Assuming you're using the filter_chain directly
+#     result = filter_chain.invoke({"context": retriever, "question": user_input})
+#     return result["output"]

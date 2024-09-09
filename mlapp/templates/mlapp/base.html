@@ -397,6 +397,41 @@
           cursor: pointer;
       }
        
+.user-info {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .popup-container {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        .popup-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .popup-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
       </style>
        
 </head>
@@ -427,69 +462,59 @@
         </a>
     </div>
     {% endif %}
+    
     <!-- Topbar -->
-    <div class="topbar">
-        <div class="logo">
+    <div class="topbar" >
+
+        <div class="logo" style="cursor:pointer" onclick="window.location.href='{% url 'home' %}'">
             <img src="{% static 'mlapp/logo.png' %}" alt="Logo">
             <span style="font-size: 20px; font-weight: bold; position: relative; left: 10px;">Work Force Analytics</span>
         </div>
-        <div class="user-info">
-            <span class="user-name">{{ user.username }}</span>
+        {% if user.is_authenticated %}
+        <div class="user-info" onclick="togglePopup()">
+            <span>Welcome {{ user.username }}!</span>
             <img src="{% static 'mlapp/Ankit.png' %}" alt="User Avatar">
+        </div> 
+        <div id="popup" class="popup-container">
+            <div class="popup-content">
+                <a href="{% url 'update_profile' %}">Update Profile</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>          
+        {% else %}
+        <div class="user-info" style="cursor:default;">
+            <a href="{% url 'login' %}" style="color:white">Login</a>
+            <p> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp</p>
+            <a href="{% url 'register' %}" style="color:white">Register</a>
         </div>
+        {% endif %}
     </div>
 
     <!-- Main Content -->
     <div class="content">
-        <!-- Notification Banner -->
-        {% comment %} <div class="notification-banner">
-            <span>Payroll submission for the current pay period is due in 2 days. Review and finalize all employee payroll details.</span>
-            <span class="more-details">More Details</span>
-        </div> {% endcomment %}
-
-        {% comment %} <div class="notification-banner">
-            <span id="notification-message"></span>
-            <span class="more-details">More Details</span>
-        </div>
-    
-        <script>
-            function getDueDate() {
-                const today = new Date();
-                const currentMonth = today.getMonth();
-                const dueDate = new Date(today.getFullYear(), currentMonth, 30);
-    
-                if (today.getDate() > 30) {
-                    dueDate.setMonth(currentMonth + 1); // Move to next month if today is after the 30th
-                    dueDate.setDate(30);
-                }
-    
-                return dueDate;
-            }
-    
-            function daysBetween(date1, date2) {
-                const oneDay = 24 * 60 * 60 * 1000;
-                return Math.round((date2 - date1) / oneDay);
-            }
-    
-            const today = new Date();
-            const dueDate = getDueDate();
-            const daysRemaining = daysBetween(today, dueDate);
-    
-            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-            const formattedDueDate = dueDate.toLocaleDateString(undefined, options);
-    
-            const message = `Payroll submission for the current pay period is due on ${formattedDueDate}. Review and finalize all employee payroll details. ${daysRemaining} days remaining.`;
-            document.getElementById('notification-message').textContent = message;
-        </script> {% endcomment %}
-
-        <!-- Action Buttons -->
-        {% comment %} <div class="action-buttons">
-            <input type="text" placeholder="Search anything...">
-            <button><i class="fas fa-file-export"></i> Export</button>
-            <button><i class="fas fa-plus"></i> New Payroll</button>
-        </div> {% endcomment %}
-
         {% block content %}{% endblock %}
     </div>
+
+    <!-- JavaScript -->
+    <script>
+        function togglePopup() {
+            const popup = document.getElementById('popup');
+            popup.classList.toggle('show');
+        }
+
+        // Close the popup if the user clicks outside of it
+        window.onclick = function(event) {
+            const popup = document.getElementById('popup');
+            // Check if the click was outside the user-info and popup-container
+            if (!event.target.closest('.user-info') && !event.target.closest('.popup-container')) {
+                if (popup.classList.contains('show')) {
+                    popup.classList.remove('show');
+                }
+            }
+        }
+
+    </script>
 </body>
+
+
 </html>
