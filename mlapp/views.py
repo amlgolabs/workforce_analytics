@@ -50,17 +50,16 @@ def contact(request):
 def contact_success(request):
     return render(request, 'mlapp/contact_success.html')
 
-def register_view(request):
+def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')  
+            return redirect('home')  # or wherever you want to redirect after successful registration
     else:
-        form = UserCreationForm()
-    
-    return render(request, 'registration/register.html', {'registration_form': form})
+        form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'form': form})
 
 def home(request):
     login_form = AuthenticationForm(request, request.POST or None)

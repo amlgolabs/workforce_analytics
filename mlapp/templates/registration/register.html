@@ -83,32 +83,54 @@
             }
 
             .info-icon {
-                position: absolute;
-                right: 5px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 16px;
-                color: #007bff;
-                cursor: pointer;
-            }
-
-            .info-text {
-                display: none;
+                display: inline-block;
+                width: 16px;
+                height: 16px;
                 background-color: #007bff;
                 color: white;
-                padding: 10px;
-                border-radius: 5px;
-                position: absolute;
-                width: 200px;
-                top: 40px;
-                right: 0;
+                border-radius: 50%;
+                text-align: center;
+                line-height: 16px;
                 font-size: 12px;
-                z-index: 10;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                margin-left: 5px;
+                cursor: help;
             }
 
-            .info-wrapper:hover .info-text {
-                display: block;
+            .tooltip {
+                position: relative;
+                display: inline-block;
+            }
+
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #007bff;
+                color: white;
+                text-align: left;
+                border-radius: 6px;
+                padding: 10px;
+                position: relative;
+                z-index: 1;                
+                left: 250px;
+                top: -130px;
+                margin-left: -100px;
+                opacity: 0;
+                transition: opacity 0.3s, visibility 0.3s;
+                font-size: 12px;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+                position: relative;
+                left: 250px;
+                top: -130px;
+            }
+
+            .optional-label::after {
+                content: " (optional)";
+                font-size: 0.8em;
+                color: #666;
             }
 
             p {
@@ -130,30 +152,92 @@
         {% block content %}
         <div class="container">
             <h2>Create Your Account</h2>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div>
-                    <label for="id_username">Username:</label>
-                    <input type="text" id="id_username" name="username" required />
+                    <label for="{{ form.username.id_for_label }}">Username:</label>
+                    {{ form.username }}
                 </div>
-                <div class="info-wrapper">
-                    <label for="id_password">Password:</label>
-                    <input type="password" id="id_password" name="password" required />
-                    <span class="info-icon" title="Password requirements">ℹ️</span>
-                    <div class="info-text">
-                        - At least 8 characters<br />
-                        - Can't be too similar to your personal info<br />
-                        - Can't be a commonly used password<br />
+                <div class="password-field">
+                    <label for="{{ form.password1.id_for_label }}">
+                        Password:
+                        <span class="info-icon" id="password-info">i</span>
+                    </label>
+                    {{ form.password1 }}
+                    <div class="tooltip" id="password-tooltip">
+                        - At least 8 characters<br>
+                        - Can't be too similar to your personal info<br>
+                        - Can't be a commonly used password<br>
                         - Can't be entirely numeric
                     </div>
                 </div>
                 <div>
-                    <label for="id_password2">Password Confirmation:</label>
-                    <input type="password" id="id_password2" name="password2" required />
+                    <label for="{{ form.password2.id_for_label }}">Password Confirmation:</label>
+                    {{ form.password2 }}
                 </div>
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="optional-label">Email:</label>
+                    {{ form.email }}
+                </div>
+                <div>
+                    <label for="{{ form.mobile.id_for_label }}" class="optional-label">Mobile Number:</label>
+                    {{ form.mobile }}
+                </div>
+                <div>
+                    <label for="{{ form.profile_picture.id_for_label }}" class="optional-label">Profile Picture:</label>
+                    {{ form.profile_picture }}
+                </div>
+                <br>
                 <button type="submit">Register</button>
             </form>
         </div>
+
+        <style>
+            .password-field {
+                position: relative;
+            }
+            .info-icon {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                background-color: #007bff;
+                color: white;
+                border-radius: 50%;
+                text-align: center;
+                line-height: 16px;
+                font-size: 12px;
+                margin-left: 5px;
+                cursor: help;
+            }
+            .tooltip {
+                display: none;
+                position: absolute;
+                background-color: #007bff;
+                color: white;
+                padding: 10px;
+                border-radius: 6px;
+                width: 200px;
+                font-size: 12px;
+                z-index: 1;
+                left: 250px;
+                top: -130px;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var infoIcon = document.getElementById('password-info');
+                var tooltip = document.getElementById('password-tooltip');
+
+                infoIcon.addEventListener('mouseenter', function() {
+                    tooltip.style.display = 'block';
+                });
+
+                infoIcon.addEventListener('mouseleave', function() {
+                    tooltip.style.display = 'none';
+                });
+            });
+        </script>
         {% endblock %}
     </body>
 </html>
