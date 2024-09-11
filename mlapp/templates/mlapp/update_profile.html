@@ -1,1 +1,13 @@
 {% extends 'mlapp/base.html' %} {% load static %}
+
+{% block content %}
+  <div class="container">
+    <h2>Update Profile</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ user_form.as_p }}
+      {{ profile_form.as_p }}
+      <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+  </div>
+{% endblock %}

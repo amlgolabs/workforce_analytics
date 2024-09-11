@@ -2,198 +2,211 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>ML Web App - Login</title>
-		<link rel="stylesheet" href="{% static 'mlapp/style.css' %}" />
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				background-color: #f7f7f7;
-				color: #333;
-				margin: 0;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100vh;
-			}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ML Web App - Login</title>
+    <link rel="stylesheet" href="{% static 'mlapp/style.css' %}" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+        color: #333;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
+      
+      h2 {
+        margin-bottom: 20px;
+        color: #007bff;
+      }
+      
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      label {
+        align-self: flex-start;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      
+      input {
+      }
+      
+      button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        height: 2.6rem;
+      }
+      
+      button:hover {
+        background-color: #0056b3;
+      }
+      
+      .errorlist {
+        color: red;
+        margin-bottom: 15px;
+        text-align: left;
+      }
+      
+      p {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+      
+      .action-buttons {
+        margin-bottom: 20px;
+      }
+      
+      .action-buttons button {
+        margin: 5px;
+      }
+      
+      .download-button {
+        background-color: #28a745;
+      }
+      
+      .download-button:hover {
+        background-color: #218838;
+      }
+      
+      .search-bar {
+        display: flex;
+      }
+      
+      .buttons {
+        display: flex;
+        gap: 10px; /* Adjust the gap between buttons */
+        width: 20%; /* Make the buttons take up 20% of the total width */
+        justify-content: flex-end; /* Align buttons to the right */
+        align-items: center; /* Vertically align the buttons */
+      }
+      .search-input {
+        width: 30rem;
+      }
+    </style>
+  </head>
+  <body>
+    {% block content %}
+      <div class="container">
+        {% if user.is_authenticated %}
+          <div class="notification-banner">
+            <span id="notification-message"></span>
+            <span class="more-details">More Details</span>
+          </div>
 
-			.container {
-				background-color: #ffffff;
-				padding: 30px;
-				border-radius: 10px;
-				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-				width: 100%;
-				max-width: 400px;
-				text-align: center;
-			}
+          <script>
+            function getDueDate() {
+              const today = new Date()
+              const currentMonth = today.getMonth()
+              const dueDate = new Date(today.getFullYear(), currentMonth, 30)
+            
+              if (today.getDate() > 30) {
+                dueDate.setMonth(currentMonth + 1) // Move to next month if today is after the 30th
+                dueDate.setDate(30)
+              }
+            
+              return dueDate
+            }
+            
+            function daysBetween(date1, date2) {
+              const oneDay = 24 * 60 * 60 * 1000
+              return Math.round((date2 - date1) / oneDay)
+            }
+            
+            const today = new Date()
+            const dueDate = getDueDate()
+            const daysRemaining = daysBetween(today, dueDate)
+            
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' }
+            const formattedDueDate = dueDate.toLocaleDateString(undefined, options)
+            
+            const message = `Payroll submission for the current pay period is due on ${formattedDueDate}. Review and finalize all employee payroll details. ${daysRemaining} days remaining.`
+            document.getElementById('notification-message').textContent = message
+          </script>
 
-			h2 {
-				margin-bottom: 20px;
-				color: #007bff;
-			}
+          <!-- Action Buttons -->
 
-			form {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-			}
-
-			label {
-				align-self: flex-start;
-				margin-bottom: 5px;
-				font-weight: bold;
-			}
-
-			input {
-				width: 100%;
-				padding: 10px;
-				margin-bottom: 15px;
-				border: 1px solid #ddd;
-				border-radius: 5px;
-				font-size: 16px;
-			}
-
-			button {
-				width: 100%;
-				padding: 10px;
-				border: none;
-				border-radius: 5px;
-				background-color: #007bff;
-				color: white;
-				font-size: 16px;
-				cursor: pointer;
-				margin-top: 10px;
-			}
-
-			button:hover {
-				background-color: #0056b3;
-			}
-
-			.errorlist {
-				color: red;
-				margin-bottom: 15px;
-				text-align: left;
-			}
-
-			p {
-				margin-top: 15px;
-				font-size: 14px;
-			}
-
-			a {
-				color: #007bff;
-				text-decoration: none;
-			}
-
-			a:hover {
-				text-decoration: underline;
-			}
-
-			.action-buttons {
-				margin-bottom: 20px;
-			}
-
-			.action-buttons button {
-				margin: 5px;
-			}
-
-			.download-button {
-				background-color: #28a745;
-			}
-
-			.download-button:hover {
-				background-color: #218838;
-			}
-		</style>
-		</head>
-	<body>
-		{% block content %}
-		<div class="container">
-			{% if user.is_authenticated %}
-				<div class="notification-banner">
-					<span id="notification-message"></span>
-					<span class="more-details">More Details</span>
-				</div>
-		
-				<script>
-					function getDueDate() {
-						const today = new Date();
-						const currentMonth = today.getMonth();
-						const dueDate = new Date(today.getFullYear(), currentMonth, 30);
-		
-						if (today.getDate() > 30) {
-							dueDate.setMonth(currentMonth + 1); // Move to next month if today is after the 30th
-							dueDate.setDate(30);
-						}
-		
-						return dueDate;
-					}
-		
-					function daysBetween(date1, date2) {
-						const oneDay = 24 * 60 * 60 * 1000;
-						return Math.round((date2 - date1) / oneDay);
-					}
-		
-					const today = new Date();
-					const dueDate = getDueDate();
-					const daysRemaining = daysBetween(today, dueDate);
-		
-					const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-					const formattedDueDate = dueDate.toLocaleDateString(undefined, options);
-		
-					const message = `Payroll submission for the current pay period is due on ${formattedDueDate}. Review and finalize all employee payroll details. ${daysRemaining} days remaining.`;
-					document.getElementById('notification-message').textContent = message;
-				</script>
-		
-				<!-- Action Buttons -->
-				<div class="action-buttons">
-					<input type="text" placeholder="Search anything...">
-					<button><i class="fas fa-file-export"></i> Export</button>
-					<button><i class="fas fa-plus"></i> New Payroll</button>
-					<a href="https://app.powerbi.com/view?r=eyJrIjoiMGFhMDg3OGMtOTNhYS00MTY3LTliN2QtNTA2ZmU1MjVhOWM1IiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9" class="download-button" target="_blank">Download Dashboard as PDF</a>
-				</div>
-				<h2>Explore Dashboard</h2>
-				<p>
-					Dashboard offers comprehensive insights and analysis tools for workforce management. 
-					Access graphical reports, advanced analytics, predictions, and AI-driven features to enhance 
-					decision-making and optimize HR processes.
-				</p>
-				<iframe
-					title="HR Analytics V2"
-					width="100%"
-					height="600"
-					src="https://app.powerbi.com/view?r=eyJrIjoiMGFhMDg3OGMtOTNhYS00MTY3LTliN2QtNTA2ZmU1MjVhOWM1IiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9"
-					frameborder="0"
-					allowFullScreen="true"
-				></iframe>
-			{% else %}
-			<h2>Login to Your Account</h2>
-			<form method="post" action="{% url 'login' %}" name="login">
-				{% csrf_token %}
-				{% if messages %}
-				<ul class="errorlist">
-					{% for message in messages %}
-					<li>{{ message }}</li>
-					{% endfor %}
-				</ul>
-				{% endif %}
-				<div>
-					<label for="id_username">Username:</label>
-					<input type="text" id="id_username" name="username" required />
-				</div>
-				<div>
-					<label for="id_password">Password:</label>
-					<input type="password" id="id_password" name="password" required />
-				</div>
-				<button type="submit">Login</button>
-			</form>
-			<p>
-				Don't have an account? <a href="{% url 'register' %}">Register here</a>
-			</p>
-			{% endif %}
-		</div>
-		{% endblock %}
-	</body>
+          <div class="search-bar" style="
+		  display: flex; gap: 1rem; justify-content: space-between;">
+            <div class="search-input" style=" width: 80rem;;">
+              <input type="text" placeholder="Search anything" style="height: 40px; margin: 0px" />
+            </div>
+            <div class="margin-top: 1rem; display: flex;" style="
+			  display: flex;
+			  gap: 1rem; ">
+              <button style="height: 2.6rem;  width: 10rem;"><i class="fas fa-file-export"></i> Export</button>
+              <button style="height: 2.6rem; width: 10rem;"><i class="fas fa-plus"></i> New Payroll</button>
+            </div>
+          </div>
+          {% comment %} <div class="action-buttons">
+            <input type="text" placeholder="Search anything..." />
+            <button><i class="fas fa-file-export"></i> Export</button>
+            <button><i class="fas fa-plus"></i> New Payroll</button> {% endcomment %}
+            {% comment %} <a href="https://app.powerbi.com/view?r=eyJrIjoiMGFhMDg3OGMtOTNhYS00MTY3LTliN2QtNTA2ZmU1MjVhOWM1IiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9" class="download-button" target="_blank">Download Dashboard as PDF</a> {% endcomment %}
+            {% comment %}
+          </div> {% endcomment %}
+          <h2>Explore Dashboard</h2>
+          <p>Dashboard offers comprehensive insights and analysis tools for workforce management. Access graphical reports, advanced analytics, predictions, and AI-driven features to enhance decision-making and optimize HR processes.</p>
+          <iframe title="HR Analytics V2" width="100%" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiMGFhMDg3OGMtOTNhYS00MTY3LTliN2QtNTA2ZmU1MjVhOWM1IiwidCI6IjI3Y2NjZDVkLWYzNWEtNGFkNC1hNTcxLWJiOTViMzEyZjI1ZCJ9" frameborder="0" allowFullScreen="true"></iframe>
+        {% else %}
+          <h2>Login to Your Account</h2>
+          <form method="post" action="{% url 'login' %}" name="login">
+            {% csrf_token %}
+            {% if messages %}
+              <ul class="errorlist">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            <div>
+              <label for="id_username">Username:</label>
+              <input type="text" id="id_username" name="username" required />
+            </div>
+            <div>
+              <label for="id_password">Password:</label>
+              <input type="password" id="id_password" name="password" required />
+            </div>
+            <button type="submit">Login</button>
+          </form>
+          <p>
+            Don't have an account? <a href="{% url 'register' %}">Register here</a>
+          </p>
+        {% endif %}
+      </div>
+    {% endblock %}
+  </body>
 </html>

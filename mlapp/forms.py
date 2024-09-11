@@ -22,3 +22,16 @@ class UploadFileForm(forms.Form):
 # class UploadFileForm(forms.Form):
 #     csv_file = forms.FileField(label='Select a CSV or Excel file', help_text='max. 5 MB', 
 #                                widget=forms.FileInput(attrs={'accept': '.csv, .xlsx, .xls'}))
+from .models import UserProfile
+
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('phone_number', 'gender')
+
+class UpdateUserForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')

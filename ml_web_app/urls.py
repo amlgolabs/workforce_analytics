@@ -50,5 +50,6 @@ urlpatterns = [
     path('process_csv3/', views.process_csv3, name='process_csv3'),
     path('generate_correlation_plot/', views.generate_correlation_plot, name='generate_correlation_plot'),
     path('download_result/', views.download_result, name='download_result'),
+    path('update_profile/', views.update_profile, name='update_profile'),
 ]
 urlpatterns += staticfiles_urlpatterns()
