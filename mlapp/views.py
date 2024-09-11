@@ -36,6 +36,25 @@ from statsmodels.graphics.mosaicplot import mosaic
 
 logger = logging.getLogger(__name__)
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import UpdateProfileForm, UpdateUserForm
+
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        profile_form = UpdateProfileForm(request.POST, instance=request.user.userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('home')
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+        profile_form = UpdateProfileForm(instance=request.user.userprofile)
+    return render(request, 'update_profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
