@@ -1,1 +1,107 @@
-{% extends 'mlapp/base.html' %} {% load static %}
+{% extends 'mlapp/base.html' %}
+{% block title %}Profile Update{% endblock %}
+{% block content %}
+<div class="container" style="width: 1200px; position:absolute; top:105px; left:265px">
+    <h2>Update Your Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h3>User Information</h3>
+        <div>
+            <label for="{{ u_form.username.id_for_label }}">Username:</label>
+            {{ u_form.username }}
+        </div>
+        <div>
+            <label for="{{ u_form.email.id_for_label }}">Email:</label>
+            {{ u_form.email }}
+        </div>
+        
+        <h3>Profile Information</h3>
+        <div>
+            <label for="{{ p_form.mobile.id_for_label }}">Mobile Number:</label>
+            {{ p_form.mobile }}
+        </div>
+        <div>
+            <label for="{{ p_form.profile_picture.id_for_label }}">Profile Picture:</label>
+            {{ p_form.profile_picture }}
+        </div>
+        
+        <h3>Change Password (Optional)</h3>
+        <div>
+            <label for="{{ password_form.old_password.id_for_label }}">Old Password:</label>
+            {{ password_form.old_password }}
+        </div>
+        <div>
+            <label for="{{ password_form.new_password1.id_for_label }}">New Password:</label>
+            {{ password_form.new_password1 }}
+        </div>
+        <div>
+            <label for="{{ password_form.new_password2.id_for_label }}">Confirm New Password:</label>
+            {{ password_form.new_password2 }}
+        </div>
+        
+        <button type="submit">Update Profile</button>
+    </form>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        background-color: #f0f0f0;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    form div {
+        margin-bottom: 15px;
+    }
+    form label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    form button {
+        width: 200px;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .messages {
+        list-style-type: none;
+        padding: 0;
+    }
+    .messages li {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    .messages .success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .messages .error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}

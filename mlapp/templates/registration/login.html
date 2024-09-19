@@ -19,7 +19,7 @@
 				border-radius: 10px;
 				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 				width: 300px; /* Add a fixed width */
-				height: 250px; /* Add a fixed height */
+				height: auto; /* Changed from 250px to auto */
 				text-align: center; /* Center the text */
 			}
 			.container form {
@@ -28,6 +28,7 @@
 			.container label {
 				display: block; /* Make the labels block-level elements */
 				margin-bottom: 10px; /* Add some margin to the labels */
+				text-align: left; /* Changed from center to left */
 			}
 			.container input[type="text"], .container input[type="password"] {
 				width: 100%; /* Make the inputs full-width */
@@ -47,6 +48,12 @@
 				border-radius: 5px; /* Add a border radius to the button */
 				cursor: pointer; /* Add a cursor to the button */
 			}
+			.errorlist {
+				color: red; /* Changed from default to red */
+				list-style-type: none; /* Changed from default to none */
+				padding: 0; /* Changed from default to 0 */
+				margin-bottom: 10px; /* Added margin-bottom */
+			}
 		</style>
 	</head>
 	<body>
@@ -62,7 +69,7 @@
 				</ul>
 				{% endif %}
 				<div>
-					<label for="id_username">Username:</label>
+					<label for="id_username">Username / Email / Mobile:</label>
 					<input type="text" id="id_username" name="username" required />
 				</div>
 				<div>

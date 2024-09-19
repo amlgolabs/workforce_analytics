@@ -32,6 +32,49 @@ from django.conf import settings
 import itertools 
 from statsmodels.graphics.mosaicplot import mosaic
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from .forms import UserUpdateForm, ProfileUpdateForm, PasswordChangeForm
+from .models import Profile  # Add this import
+
+@login_required
+def update_profile(request):
+    # Ensure the user has a profile
+    Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        password_form = PasswordChangeForm(request.POST)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, 'Your profile has been updated!')
+
+            if password_form.is_valid() and password_form.cleaned_data.get('old_password'):
+                if request.user.check_password(password_form.cleaned_data.get('old_password')):
+                    request.user.set_password(password_form.cleaned_data.get('new_password1'))
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, 'Your password has been updated!')
+                else:
+                    messages.error(request, 'Incorrect old password.')
+
+            return redirect('update_profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+        password_form = PasswordChangeForm()
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+        'password_form': password_form
+    }
+
+    return render(request, 'mlapp/update_profile.html', context)
 
 
 logger = logging.getLogger(__name__)
@@ -169,7 +212,7 @@ def user_logout(request):
     except Exception as e:
         # Handle any exceptions that occur during file operations
         print(f"An error occurred: {e}")
-    
+    return redirect('login')
 
 def handle_uploaded_file(f):
     file_path = os.path.join(settings.STATICFILES_DIRS[0], 'mlapp', 'file.csv')
@@ -1237,9 +1280,6 @@ def process_csv3(request):
     
     return response
 
-def update_profile(request):
-    return render(request, 'mlapp/update_profile.html')
-
 def salary_hike_recommendation(request):
     return render(request, 'mlapp/salary_hike_recommendation.html')
 
@@ -1426,7 +1466,7 @@ Years with Current Manager: The number of years the employee has worked with the
 
 Key points to remember:
 1. Return ONLY the Python code, without any explanations or additional text.
-2. Use matplotlib.pyplot as plt for plotting.
+2. Use matplotlib.pyplot as plt for plotting and assume all necessary libraries are already imported.
 3. Always include proper labels for axes and a title for the graph.
 4. Choose an appropriate graph type based on the data and question (e.g., bar plot, histogram, scatter plot, box plot).
 5. If filtering is required, include the filtering code before plotting.

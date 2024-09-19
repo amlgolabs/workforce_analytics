@@ -38,3 +38,28 @@ class UploadFileForm(forms.Form):
 # class UploadFileForm(forms.Form):
 #     csv_file = forms.FileField(label='Select a CSV or Excel file', help_text='max. 5 MB', 
 #                                widget=forms.FileInput(attrs={'accept': '.csv, .xlsx, .xls'}))
+
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['mobile', 'profile_picture']
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput())
+    new_password1 = forms.CharField(widget=forms.PasswordInput())
+    new_password2 = forms.CharField(widget=forms.PasswordInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password1 = cleaned_data.get('new_password1')
+        new_password2 = cleaned_data.get('new_password2')
+
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            raise forms.ValidationError("The two password fields didn't match.")
